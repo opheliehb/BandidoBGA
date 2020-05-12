@@ -49,10 +49,24 @@
 /********* You can start writing your CSS below this line: **********/
 
 
-.card {
+.row { 
+	width: 98%;
+	min-width: 800px;
+    height: 200px;
+    text-align: center;
+    vertical-align:top;
+}
+
+.playerhand {
+	display:inline-block;
+    position: relative;
+    background-color: blue
+}
+
+.cardontable {
     position: absolute;
-    width: 72px;
-    height: 96px;
+    width: 261px;
+    height: 134px;
     background-image: url('img/cards.jpg'); 
 }
 

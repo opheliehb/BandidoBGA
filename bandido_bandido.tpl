@@ -37,22 +37,20 @@
 
     </div>
 
-    <div class="row">
-        <div id="board" class="board" style="border: 2px solid">
-            <div id="map_container" style="width: {SIZE}px; min-height: {SIZE}px">
-                <div id="map_scrollable"></div>
-                <div id="map_surface"></div>
-                <div id="map_scrollable_oversurface">
-                    <div id="supercard" class="card"></div>
-                </div>
-                <a id="movetop" class="map_arrow" href="#"></a>
-                <a id="moveleft" class="map_arrow" href="#"></a>
-                <a id="moveright" class="map_arrow" href="#"></a>
-                <a id="movedown" class="map_arrow" href="#"></a>
+    <div id="board" class="board" style="border: 2px solid">
+        <div id="map_container">
+            <div id="map_scrollable"></div>
+            <div id="map_surface"></div>
+            <div id="map_scrollable_oversurface">
+                <div id="supercard" class="card"></div>
             </div>
-            <div id="map_footer" class="whiteblock">
-                <a href="#" id="enlargedisplay">↓ {LABEL_ENLARGE_DISPLAY} ↓</a>
-            </div>
+            <a id="movetop" class="map_arrow" href="#"></a>
+            <a id="moveleft" class="map_arrow" href="#"></a>
+            <a id="moveright" class="map_arrow" href="#"></a>
+            <a id="movedown" class="map_arrow" href="#"></a>
+        </div>
+        <div id="map_footer" class="whiteblock">
+            <a href="#" id="enlargedisplay">↓ {LABEL_ENLARGE_DISPLAY} ↓</a>
         </div>
     </div>
 
@@ -61,13 +59,10 @@
 
 <script type="text/javascript">
 
-// Javascript HTML templates
-
-    /*
-    // Example:
-    var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
-    
-    */
+    var jstpl_cardontable = '<div class="cardontable"\
+                              id="cardontable_${id}"\
+                              style="background-position:-${x}px -${y}px">\
+                        </div>';
 
 </script>
 

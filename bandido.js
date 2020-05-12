@@ -19,7 +19,8 @@ define([
     "dojo", "dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter",
-    "ebg/scrollmap"
+    "ebg/scrollmap",
+    "ebg/stock"
 ],
     function (dojo, declare) {
         return declare("bgagame.bandido", ebg.core.gamegui, {
@@ -27,6 +28,8 @@ define([
                 console.log('bandido constructor');
 
                 this.scrollmap = new ebg.scrollmap();
+                this.cardwidth = 261;
+                this.cardheight = 134;
             },
 
             /*
@@ -52,7 +55,26 @@ define([
                     // TODO: Setting up players boards if needed
                 }
 
-                // TODO: Set up your game interface here, according to "gamedatas"
+                dojo.place(this.format_block('jstpl_cardontable', {id: 0, x: 0, y: 70*134}), $('map_scrollable'));
+
+                this.playerHand = new ebg.stock();
+                this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
+                this.playerHand.image_items_per_row = 1;
+
+                // Create cards types:
+                for (var row = 1; row <= 69; row++) {
+                    this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row-1);
+                }
+                debugger;
+                // Cards in player's hand
+                for (var i in this.gamedatas.hand) {
+                    var card = this.gamedatas.hand[i];
+                    this.playerHand.addToStockWithId(card.type_arg, card.id);
+                }
+                this.playerHand.setSelectionMode(1);
+
+                // Setup game notifications to handle (see "setupNotifications" method below)
+                this.setupNotifications();
 
                 /** Begin scrollmap setup */
                 this.scrollmap.create(
@@ -67,9 +89,6 @@ define([
                 dojo.connect($('movedown'), 'onclick', this, 'onMoveDown');
                 dojo.connect($('enlargedisplay'), 'onclick', this, 'onIncreaseDisplayHeight');
                 /** End scrollmap setup */
-
-                // Setup game notifications to handle (see "setupNotifications" method below)
-                this.setupNotifications();
 
                 console.log("Ending game setup");
             },

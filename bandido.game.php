@@ -41,6 +41,9 @@ class Bandido extends Table
             //    "my_second_game_variant" => 101,
             //      ...
         ));
+
+        $this->cards = self::getNew("module.common.deck");
+        $this->cards->init("card");
     }
 
     protected function getGameName()
@@ -88,7 +91,12 @@ class Bandido extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // TODO: setup the initial game situation here
+        for ($value = 1; $value <= 69; $value++) {
+            $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
+        }
 
+        $this->cards->createCards($cards, 'deck');
+        self::dealStartingCards();
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -116,6 +124,8 @@ class Bandido extends Table
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
+        // Cards in player hand      
+        $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;
@@ -147,7 +157,19 @@ class Bandido extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
+    function dealStartingCards()
+    {
+        // Take back all cards (from any location => null) to deck and reshuffle
+        $this->cards->moveAllCardsInLocation(null, "deck");
+        $this->cards->shuffle('deck');
 
+        // Deal 7 cards to each player
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            // Put 7 cards in each player hand
+            $this->cards->pickCards(3, 'deck', $player_id);
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
