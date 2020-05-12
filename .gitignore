@@ -1,0 +1,6 @@
+bgaproject.yml
+build/*
+dist/*
+vendor/*
+composer*
+img/*
