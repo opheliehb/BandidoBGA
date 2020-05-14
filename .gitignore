@@ -4,3 +4,4 @@ dist/*
 vendor/*
 composer*
 img/*
+buildAndWatch.ps1
