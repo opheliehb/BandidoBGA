@@ -28,12 +28,11 @@
 <div>
 
     <div class="row">
-        <div class="deck">
-
+        <div id="deck" class="deck">
         </div>
 
-        <div id="playerhand">
-        </div>
+            <div id="playerhand" class="playerhand">
+            </div>
 
     </div>
 

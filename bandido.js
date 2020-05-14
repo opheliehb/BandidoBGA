@@ -65,7 +65,7 @@ define([
                 for (var row = 1; row <= 69; row++) {
                     this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row-1);
                 }
-                debugger;
+                
                 // Cards in player's hand
                 for (var i in this.gamedatas.hand) {
                     var card = this.gamedatas.hand[i];
