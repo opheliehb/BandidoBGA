@@ -5,3 +5,4 @@ vendor/*
 composer*
 img/*
 .DS_Store
+buildAndWatch.ps1

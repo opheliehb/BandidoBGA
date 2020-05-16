@@ -49,7 +49,8 @@
 /********* You can start writing your CSS below this line: **********/
 
 
-.row { 
+.row {
+    display: flex;
 	width: 98%;
 	min-width: 800px;
     height: 200px;
@@ -58,9 +59,15 @@
 }
 
 .playerhand {
-	display:inline-block;
-    position: relative;
-    background-color: blue
+	min-width: 800px;
+}
+
+.deck {
+    margin-right: 10px;
+    width: 261px;
+    height: 134px;
+    background-image: url('img/cards.jpg'); 
+    background-position: 0% -6900%;
 }
 
 .cardontable {
