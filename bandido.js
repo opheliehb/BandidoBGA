@@ -58,8 +58,10 @@ define([
                 // Add supercard in the center of the scrollmap
                 dojo.place(
                     this.format_block('jstpl_cardontable',
-                        {id: this.gamedatas.supercard_id, x: 0, y: this.gamedatas.supercard_id*134}),
+                        { id: this.gamedatas.supercard_id, x: 0, y: this.gamedatas.supercard_id * 134 }),
                     $('map_scrollable_oversurface'));
+                dojo.style('cardontable_' + this.gamedatas.supercard_id, 'left', '0px');
+                dojo.style('cardontable_' + this.gamedatas.supercard_id, 'top', '0px');
 
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
@@ -67,9 +69,9 @@ define([
 
                 // Create cards types:
                 for (var row = 1; row <= 69; row++) {
-                    this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row-1);
+                    this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row - 1);
                 }
-                
+
                 // Cards in player's hand
                 for (var i in this.gamedatas.hand) {
                     var card = this.gamedatas.hand[i];
@@ -108,19 +110,7 @@ define([
                 console.log('Entering state: ' + stateName);
 
                 switch (stateName) {
-
-                    /* Example:
-                    
-                    case 'myGameState':
-                    
-                        // Show some HTML block at this game state
-                        dojo.style( 'my_html_block_id', 'display', 'block' );
-                        
-                        break;
-                   */
-
-
-                    case 'dummmy':
+                    case 'playerTurn':
                         break;
                 }
             },
@@ -187,18 +177,9 @@ define([
 
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
-                        /*               
-                                         Example:
-                         
-                                         case 'myGameState':
-                                            
-                                            // Add 3 action buttons in the action status bar:
-                                            
-                                            this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                                            this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                                            this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
-                                            break;
-                        */
+                        case 'playerTurn':
+                            this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
+                            break;
                     }
                 }
             },
@@ -228,6 +209,20 @@ define([
             
             */
 
+            onDebugPlaceCard: function (evt) {
+                dojo.stopEvent(evt);
+                this.placeCard(16, {x: -1, y: -1});
+            },
+
+            placeCard: function(card_id, position) {
+                var backgroundpos_y = card_id * this.cardheight;
+                dojo.place(
+                    // TODO change jstpl_cardontable because x is always 0
+                    this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
+                    $('map_scrollable_oversurface'));
+                dojo.style('cardontable_' + card_id, 'left', position.x * this.cardwidth/2 + 'px');
+                dojo.style('cardontable_' + card_id, 'top', position.y * this.cardheight + 'px');
+            },
             /* Example:
             
             onMyMethodToCall1: function( evt )
