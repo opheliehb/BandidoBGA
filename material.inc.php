@@ -19,3 +19,18 @@
  * are available everywhere in your game logic code.
  *
  */
+
+
+/*** 
+ * Each card is represented by 2 squares (or subcards).
+ * Each subcards has 4 coordinates, top, bottom, left, and right.
+ * Each coordinates can be
+ * (-) -1 if there is an exit not yet linked to another card;
+ * (-) null if there is no exit; or
+ * (-) a positive integer i, symbolizing a card id, if the exit is linked to card i.
+ * By convention, the left subcard right exit is linked to their left subcard right exit.
+ */
+
+$this->cards_to_subcards = array(
+    70 => [[-1, -1, -1, 70],[-1, -1, 70, -1]]
+);

@@ -55,7 +55,11 @@ define([
                     // TODO: Setting up players boards if needed
                 }
 
-                dojo.place(this.format_block('jstpl_cardontable', {id: 0, x: 0, y: 70*134}), $('map_scrollable'));
+                // Add supercard in the center of the scrollmap
+                dojo.place(
+                    this.format_block('jstpl_cardontable',
+                        {id: this.gamedatas.supercard_id, x: 0, y: this.gamedatas.supercard_id*134}),
+                    $('map_scrollable_oversurface'));
 
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);

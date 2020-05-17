@@ -34,12 +34,7 @@ class Bandido extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
+            "superCardId" => 10,
         ));
 
         $this->cards = self::getNew("module.common.deck");
@@ -80,23 +75,27 @@ class Bandido extends Table
         self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         self::reloadPlayersBasicInfos();
 
+        
         /************ Start the game initialization *****/
-
+        
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-
+        
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+        
+        // Set supercard id value TODO set it to the value chosen in settings
+        self::setGameStateInitialValue("superCardId", 70);
 
-        // TODO: setup the initial game situation here
         for ($value = 1; $value <= 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
         }
 
         $this->cards->createCards($cards, 'deck');
         self::dealStartingCards();
+
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -126,7 +125,9 @@ class Bandido extends Table
 
         // Cards in player hand      
         $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
+ 
+        // supercard id
+        $result['supercard_id'] = self::getGameStateValue("superCardId");
 
         return $result;
     }
@@ -169,6 +170,34 @@ class Bandido extends Table
             // Put 7 cards in each player hand
             $this->cards->pickCards(3, 'deck', $player_id);
         }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    //////////// Card placement on map section
+    ////////////   
+
+    function getScrollmapGrid()
+    {
+        $grid = array();
+        // Create all possible lines (and more) to avoid more checks later on
+        for ($x = -69; $x <= 69; $x++) {
+            $grid[$x] = array();
+            for ($y = -69; $y <= 69; $y++) {
+                $grid[$x][$y] = null;
+            }
+        }
+        $supercardId = self::getGameStateValue("superCardId");
+        $grid[0][0] = array('card_id' => $supercardId, 'card' => $this->cards_to_subcards[70][0]);
+        $grid[0][1] = array('card_id' => $supercardId, 'card' => $this->cards_to_subcards[70][1]);
+        // $dominoes = self::getCollectionFromDb(
+        //     "SELECT `number`, rotation, horizontal_position x, vertical_position y 
+        //     FROM dominoes 
+        //     WHERE location = 'grid' 
+        //         AND owner_player = $player_id");
+        // foreach ($dominoes as $number => $position) {
+        //     $this->addTogridView($grid, $number, $position);
+        // }
+        return $grid;
     }
 
     //////////////////////////////////////////////////////////////////////////////
