@@ -56,12 +56,7 @@ define([
                 }
 
                 // Add supercard in the center of the scrollmap
-                dojo.place(
-                    this.format_block('jstpl_cardontable',
-                        { id: this.gamedatas.supercard_id, x: 0, y: this.gamedatas.supercard_id * 134 }),
-                    $('map_scrollable_oversurface'));
-                dojo.style('cardontable_' + this.gamedatas.supercard_id, 'left', '0px');
-                dojo.style('cardontable_' + this.gamedatas.supercard_id, 'top', '0px');
+                this.placeCard(this.gamedatas.supercard_id, {x:0, y:0, rotation:0});
 
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
@@ -178,7 +173,6 @@ define([
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
                         case 'playerTurn':
-                            this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
                             break;
                     }
                 }
@@ -209,19 +203,41 @@ define([
             
             */
 
-            onDebugPlaceCard: function (evt) {
-                dojo.stopEvent(evt);
-                this.placeCard(16, {x: -1, y: -1});
-            },
-
             placeCard: function(card_id, position) {
                 var backgroundpos_y = card_id * this.cardheight;
                 dojo.place(
                     // TODO change jstpl_cardontable because x is always 0
                     this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
                     $('map_scrollable_oversurface'));
-                dojo.style('cardontable_' + card_id, 'left', position.x * this.cardwidth/2 + 'px');
-                dojo.style('cardontable_' + card_id, 'top', position.y * this.cardheight + 'px');
+                    
+                var divid = 'cardontable_' + card_id;
+                switch(position.rotation)
+                {
+                    case 90:
+                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/4 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + this.cardheight/2 + 'px');
+                        dojo.style(divid, 'transform', 'rotate(' + 90 + 'deg)');
+                        break;
+                    case 180:
+                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/2 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
+                        dojo.style(divid, 'transform', 'rotate(' + 180 + 'deg)');
+                        break;
+                    case 180:
+                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/2 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
+                        dojo.style(divid, 'transform', 'rotate(' + 180 + 'deg)');
+                        break;
+                    case 270:
+                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/4 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight - this.cardheight/2 + 'px');
+                        dojo.style(divid, 'transform', 'rotate(-90deg)');
+                        break;
+                    default: // no rotation or rotation = 0
+                        dojo.style(divid, 'left', position.x * this.cardwidth/2 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
+                        break;
+                }
             },
             /* Example:
             
