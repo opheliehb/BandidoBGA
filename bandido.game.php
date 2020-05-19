@@ -75,19 +75,19 @@ class Bandido extends Table
         self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         self::reloadPlayersBasicInfos();
 
-        
+
         /************ Start the game initialization *****/
-        
+
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-        
+
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
-        
+
         // Set supercard id value TODO set it to the value chosen in settings
-        self::setGameStateInitialValue("superCardId", 70);
+        self::setGameStateInitialValue("superCardId", 71);
 
         for ($value = 1; $value <= 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
@@ -125,7 +125,7 @@ class Bandido extends Table
 
         // Cards in player hand      
         $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
- 
+
         // supercard id
         $result['supercard_id'] = self::getGameStateValue("superCardId");
 
@@ -209,31 +209,26 @@ class Bandido extends Table
         (note: each method below must match an input method in bandido.action.php)
     */
 
-    /*
-    
-    Example:
-
-    function playCard( $card_id )
+    function playCard($card_id, $x, $y, $rotation)
     {
-        // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
-        self::checkAction( 'playCard' ); 
-        
+        // Check that action is possible for player
+        self::checkAction('playCard');
+
         $player_id = self::getActivePlayerId();
-        
-        // Add your game logic to play a card there 
-        ...
-        
+
+        // TODO check the card can be played
+        $card = $this->cards->getCard($card_id);
+
         // Notify all players about the card played
-        self::notifyAllPlayers( "cardPlayed", clienttranslate( '${player_name} plays ${card_name}' ), array(
+        self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
             'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
-            'card_name' => $card_name,
-            'card_id' => $card_id
-        ) );
-          
+            'card_type' => $card['type_arg'],
+            'x' => $x,
+            'y' => $y,
+            'rotation' => $rotation
+        ));
     }
-    
-    */
 
 
     //////////////////////////////////////////////////////////////////////////////

@@ -56,7 +56,7 @@ define([
                 }
 
                 // Add supercard in the center of the scrollmap
-                this.placeCard(this.gamedatas.supercard_id, {x:0, y:0, rotation:0});
+                this.placeCard(this.gamedatas.supercard_id, { x: 0, y: 0, rotation: 0 });
 
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
@@ -173,6 +173,7 @@ define([
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
                         case 'playerTurn':
+                            this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
                             break;
                     }
                 }
@@ -188,6 +189,10 @@ define([
             
             */
 
+            getPossibleMoveId: function(x, y, rotation)
+            {
+                return 'possiblemove_' + x + '_' + y + '_' + rotation;
+            },
 
             ///////////////////////////////////////////////////
             //// Player's action
@@ -203,38 +208,85 @@ define([
             
             */
 
-            placeCard: function(card_id, position) {
-                var backgroundpos_y = card_id * this.cardheight;
+            onDebugPlaceCard: function (evt) {
+                dojo.stopEvent(evt);
+
+                var x = -1;
+                var y = -1;
+                var rotation = 90;
+
+                dojo.place(
+                    "<div id=" + this.getPossibleMoveId(x, y, rotation) + " class=possiblemove></div>",
+                    $('map_scrollable_oversurface'));
+                this.placeCardDiv(this.getPossibleMoveId(x, y, rotation), { x: x, y: y, rotation: rotation });
+
+                dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
+            },
+
+            onClickPossibleMove: function (evt) {
+                dojo.stopEvent(evt);
+                // Get the cliqued move x and y
+                // Note: possiblemove id format is "possiblemove_X_Y_rotation"
+                var coords = evt.currentTarget.id.split('_');
+                var x = coords[1];
+                var y = coords[2];
+                var rotation = coords[3];
+
+                if (!dojo.hasClass(this.getPossibleMoveId(x, y, rotation), 'possiblemove')) {
+                    // This is not a possible move => the click does nothing
+                    return;
+                }
+
+                if (this.checkAction('playCard'))    // Check that this action is possible at this moment
+                {
+                    var selected = this.playerHand.getSelectedItems();
+                    if (selected.length > 0) {
+                        card = selected[0];
+
+                        this.ajaxcall("/bandido/bandido/playCard.html", {
+                            x: x,
+                            y: y,
+                            rotation: rotation,
+                            cardId: card.id,
+                        }, this, function (result) { });
+                    }
+                }
+            },
+
+            /*** Places card card_id on the position {position.x, position.y}, rotated by (position.rotation) degrees
+             * position.rotation can be 0, 90, 180, -90
+             * The left square of the card will be the one placed
+             */
+            placeCard: function (card_id, position) {
+                var backgroundpos_y = (card_id-1) * this.cardheight;
                 dojo.place(
                     // TODO change jstpl_cardontable because x is always 0
                     this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
                     $('map_scrollable_oversurface'));
-                    
+
                 var divid = 'cardontable_' + card_id;
-                switch(position.rotation)
-                {
-                    case 90:
-                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/4 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight + this.cardheight/2 + 'px');
-                        dojo.style(divid, 'transform', 'rotate(' + 90 + 'deg)');
+                this.placeCardDiv(divid, position)
+            },
+
+            placeCardDiv: function (divid, position) {
+                switch (position.rotation.toString()) {
+                    case "90":
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 4 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + this.cardheight / 2 + 'px');
+                        dojo.style(divid, 'transform', 'rotate(90deg)');
                         break;
-                    case 180:
-                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/2 + 'px');
+                    case "180":
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 2 + 'px');
                         dojo.style(divid, 'top', position.y * this.cardheight + 'px');
-                        dojo.style(divid, 'transform', 'rotate(' + 180 + 'deg)');
+                        dojo.style(divid, 'transform', 'rotate(180deg)');
                         break;
-                    case 180:
-                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/2 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
-                        dojo.style(divid, 'transform', 'rotate(' + 180 + 'deg)');
-                        break;
-                    case 270:
-                        dojo.style(divid, 'left', position.x * this.cardwidth/2 - this.cardwidth/4 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight - this.cardheight/2 + 'px');
+                    case "270":
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 4 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight - this.cardheight / 2 + 'px');
                         dojo.style(divid, 'transform', 'rotate(-90deg)');
                         break;
                     default: // no rotation or rotation = 0
-                        dojo.style(divid, 'left', position.x * this.cardwidth/2 + 'px');
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 + 'px');
                         dojo.style(divid, 'top', position.y * this.cardheight + 'px');
                         break;
                 }
@@ -288,35 +340,21 @@ define([
             */
             setupNotifications: function () {
                 console.log('notifications subscriptions setup');
-
-                // TODO: here, associate your game notifications with local methods
-
-                // Example 1: standard notification handling
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-                // Example 2: standard notification handling + tell the user interface to wait
-                //            during 3 seconds after calling the method in order to let the players
-                //            see what is happening in the game.
-                // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-                // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-                // 
+                dojo.subscribe('cardPlayed', this, "notif_cardPlayed");
             },
 
-            // TODO: from this point and below, you can write your game notifications handling methods
+            notif_cardPlayed: function (notif) {
+                console.log('notif_cardPlayed');
+                console.log(notif);
 
-            /*
-            Example:
-            
-            notif_cardPlayed: function( notif )
-            {
-                console.log( 'notif_cardPlayed' );
-                console.log( notif );
-                
-                // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-                
-                // TODO: play the card in the user interface.
-            },    
-            
-            */
+                if (this.isCurrentPlayerActive()) {
+                    this.playerHand.removeFromStock(
+                        notif.args.card_type,
+                        this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation));
+                }
+
+                this.placeCard(notif.args.card_type,
+                    {x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation});
+            },
         });
     });

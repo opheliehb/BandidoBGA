@@ -37,27 +37,16 @@ class action_bandido extends APP_GameAction
     }
   }
 
-  // TODO: defines your action entry points there
 
+  public function playCard()
+  {
+    self::setAjaxMode();
+    $cardId = self::getArg("cardId", AT_posint, true);
+    $x = self::getArg("x", AT_int, true);
+    $y = self::getArg("y", AT_int, true);
+    $rotation = self::getArg("rotation", AT_int, true);
+    $result = $this->game->playCard($cardId, $x, $y, $rotation);
+    self::ajaxResponse();
+  }
 
-  /*
-    
-    Example:
-  	
-    public function myAction()
-    {
-        self::setAjaxMode();     
-
-        // Retrieve arguments
-        // Note: these arguments correspond to what has been sent through the javascript "ajaxcall" method
-        $arg1 = self::getArg( "myArgument1", AT_posint, true );
-        $arg2 = self::getArg( "myArgument2", AT_posint, true );
-
-        // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
-        $this->game->myAction( $arg1, $arg2 );
-
-        self::ajaxResponse( );
-    }
-    
-    */
 }

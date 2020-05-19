@@ -77,6 +77,14 @@
     background-image: url('img/cards.jpg'); 
 }
 
+.possiblemove {
+    position: absolute;
+    width: 261px;
+    height: 134px;
+    background-color: white;
+    opacity: 0.5; 
+}
+
 /** Begin Scrollmap classes **/
 #map_container {
     position: relative;

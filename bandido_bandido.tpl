@@ -61,7 +61,7 @@
     var jstpl_cardontable = '<div class="cardontable"\
                               id="cardontable_${id}"\
                               style="background-position:-${x}px -${y}px">\
-                        </div>';
+                            </div>';
 
 </script>
 
