@@ -26,26 +26,24 @@
 
 $game_options = array(
 
-    /*
-    
     // note: game variant ID should start at 100 (ie: 100, 101, 102, ...). The maximum is 199.
     100 => array(
-                'name' => totranslate('my game option'),    
-                'values' => array(
+        'name' => totranslate('Exits on supercard'),
+        'values' => array(
+            70 => array('name' => totranslate('6 exits'),
+                        'tmdisplay' => totranslate('6 exits on the first card'),
+                        'nobeginner' => true),
+            71 => array('name' => totranslate('5 exits'),
+                        'tmdisplay' => totranslate('5 exits on the first card')),
+        )
+    ),
+    // 101 => array(
+    //     'name' => totranslate('Game version'),
+    //     'values' => array(
+    //         1 => array('name' => totranslate('Standard')),
+    //         2 => array('name' => totranslate('Covid-19 edition'),
+    //                     'description' => totranslate('The Helvetiq team decided to pull one of the strongest cards against Covid-19. That is a print-and-play adaptation of best-selling Bandido.')),
+    //     )
+    // ),
 
-                            // A simple value for this option:
-                            1 => array( 'name' => totranslate('option 1') )
-
-                            // A simple value for this option.
-                            // If this value is chosen, the value of "tmdisplay" is displayed in the game lobby
-                            2 => array( 'name' => totranslate('option 2'), 'tmdisplay' => totranslate('option 2') ),
-
-                            // Another value, with other options:
-                            //  description => this text will be displayed underneath the option when this value is selected to explain what it does
-                            //  beta=true => this option is in beta version right now.
-                            //  nobeginner=true  =>  this option is not recommended for beginners
-                            3 => array( 'name' => totranslate('option 3'), 'description' => totranslate('this option does X'), 'beta' => true, 'nobeginner' => true )
-                        )
-            )
-
-    */);
+);
