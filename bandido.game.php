@@ -86,7 +86,7 @@ class Bandido extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        for ($value = 1; $value <= 69; $value++) {
+        for ($value = 0; $value < 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
         }
 
