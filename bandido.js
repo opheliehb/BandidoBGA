@@ -63,8 +63,8 @@ define([
                 this.playerHand.image_items_per_row = 1;
 
                 // Create cards types:
-                for (var row = 1; row <= 69; row++) {
-                    this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row - 1);
+                for (var row = 0; row < 69; row++) {
+                    this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row);
                 }
 
                 // Cards in player's hand
@@ -191,7 +191,7 @@ define([
              * places it at position.
              */
             placeCard: function (card_id, position) {
-                var backgroundpos_y = (card_id - 1) * this.cardheight;
+                var backgroundpos_y = card_id * this.cardheight;
                 dojo.place(
                     // TODO change jstpl_cardontable because x is always 0
                     this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),

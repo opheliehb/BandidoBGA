@@ -34,7 +34,7 @@ class Bandido extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            "superCardId" => 10,
+            "supercardId" => 100
         ));
 
         $this->cards = self::getNew("module.common.deck");
@@ -86,16 +86,12 @@ class Bandido extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // Set supercard id value TODO set it to the value chosen in settings
-        self::setGameStateInitialValue("superCardId", 71);
-
-        for ($value = 1; $value <= 69; $value++) {
+        for ($value = 0; $value < 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
         }
 
         $this->cards->createCards($cards, 'deck');
         self::dealStartingCards();
-
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -125,9 +121,9 @@ class Bandido extends Table
 
         // Cards in player hand      
         $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
-
+        
         // supercard id
-        $result['supercard_id'] = self::getGameStateValue("superCardId");
+        $result['supercard_id'] = self::getGameStateValue('supercardId');
 
         return $result;
     }
@@ -186,9 +182,8 @@ class Bandido extends Table
                 $grid[$x][$y] = null;
             }
         }
-        $supercardId = self::getGameStateValue("superCardId");
-        $grid[0][0] = array('card_id' => $supercardId, 'card' => $this->cards_to_subcards[70][0]);
-        $grid[0][1] = array('card_id' => $supercardId, 'card' => $this->cards_to_subcards[70][1]);
+        $grid[0][0] = array('card_id' => self::getGameStateValue('supercardId'), 'card' => $this->cards_to_subcards[70][0]);
+        $grid[0][1] = array('card_id' => self::getGameStateValue('supercardId'), 'card' => $this->cards_to_subcards[70][1]);
         // $dominoes = self::getCollectionFromDb(
         //     "SELECT `number`, rotation, horizontal_position x, vertical_position y 
         //     FROM dominoes 
