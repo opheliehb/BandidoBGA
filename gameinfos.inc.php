@@ -13,22 +13,22 @@
 $gameinfos = array(
 
     // Name of the game in English (will serve as the basis for translation) 
-    'game_name' => "My Great Game",
+    'game_name' => "Bandido",
 
     // Game designer (or game designers, separated by commas)
-    'designer' => 'John Doe',
+    'designer' => 'Martin Nedergaard Andersen',
 
     // Game artist (or game artists, separated by commas)
-    'artist' => 'Jane Doe',
+    'artist' => 'Odile Sageat, Lucas Guidetti Perez',
 
     // Year of FIRST publication of this game. Can be negative.
-    'year' => 2000,
+    'year' => 2016,
 
     // Game publisher
-    'publisher' => 'My Publishing Company',
+    'publisher' => 'Helvetiq',
 
     // Url of game publisher website
-    'publisher_website' => 'http://www.mypublishingcompany.com/',
+    'publisher_website' => 'https://www.helvetiq.com',
 
     // Board Game Geek ID of the publisher
     'publisher_bgg_id' => 21478,
@@ -38,7 +38,7 @@ $gameinfos = array(
 
 
     // Players configuration that can be played (ex: 2 to 4 players)
-    'players' => array(2, 3, 4),
+    'players' => array(1, 2, 3, 4),
 
     // Suggest players to play with this number of players. Must be null if there is no such advice, or if there is only one possible player configuration.
     'suggest_player_number' => null,
@@ -76,11 +76,11 @@ $gameinfos = array(
     'is_beta' => 1,
 
     // Is this game cooperative (all players wins together or loose together)
-    'is_coop' => 0,
+    'is_coop' => 1,
 
 
     // Complexity of the game, from 0 (extremely simple) to 5 (extremely complex)
-    'complexity' => 3,
+    'complexity' => 1,
 
     // Luck of the game, from 0 (absolutely no luck in this game) to 5 (totally luck driven)
     'luck' => 3,
@@ -89,7 +89,7 @@ $gameinfos = array(
     'strategy' => 3,
 
     // Diplomacy of the game, from 0 (no interaction in this game) to 5 (totally based on interaction and discussion between players)
-    'diplomacy' => 3,
+    'diplomacy' => 4,
 
     // Colors attributed to players
     'player_colors' => array("ff0000", "008000", "0000ff", "ffa500", "773300"),
@@ -123,8 +123,11 @@ $gameinfos = array(
     // Each paragraph must be wrapped with totranslate() for translation and should not contain html (plain text without formatting).
     // A good length for this text is between 100 and 150 words (about 6 to 9 lines on a standard display)
     'presentation' => array(
-        //    totranslate("This wonderful game is about geometric shapes!"),
-        //    totranslate("It was awarded best triangle game of the year in 2005 and nominated for the Spiel des Jahres."),
+        totranslate("Bandido is trying to escape AGAIN."),
+        totranslate("Team up to stop him!"),
+        totranslate("This is a cooperative game, which means that all players play together."),
+        totranslate("Place your cards so that all tunnels are blocked and Bandido cannot break out of jail.
+        "),
         //    ...
     ),
 
@@ -135,7 +138,7 @@ $gameinfos = array(
     //  http://en.doc.boardgamearena.com/Game_meta-information:_gameinfos.inc.php
     //  IMPORTANT: this list should be ORDERED, with the most important tag first.
     //  IMPORTANT: it is mandatory that the FIRST tag is 1, 2, 3 and 4 (= game category)
-    'tags' => array(2),
+    'tags' => array(2, 11, 200),
 
 
     //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)

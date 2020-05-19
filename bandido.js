@@ -182,16 +182,52 @@ define([
             ///////////////////////////////////////////////////
             //// Utility methods
 
-            /*
-            
-                Here, you can defines some utility methods that you can use everywhere in your javascript
-                script.
-            
-            */
-
-            getPossibleMoveId: function(x, y, rotation)
-            {
+            /*** get the div id of a possible move in (x,y) rotated by (rotation) degrees */
+            getPossibleMoveId: function (x, y, rotation) {
                 return 'possiblemove_' + x + '_' + y + '_' + rotation;
+            },
+
+            /*** Creates a div corresponding to the card indicated by card_id,
+             * places it at position.
+             */
+            placeCard: function (card_id, position) {
+                var backgroundpos_y = (card_id - 1) * this.cardheight;
+                dojo.place(
+                    // TODO change jstpl_cardontable because x is always 0
+                    this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
+                    $('map_scrollable_oversurface'));
+
+                var divid = 'cardontable_' + card_id;
+                this.placeCardDiv(divid, position)
+            },
+
+            /*** Moves divid on the position {position.x, position.y}, rotated by (position.rotation) degrees
+             * position.rotation can be 0, 90, 180, -90
+             * The left square of the card will be the one placed to (x,y)
+             * divid can be a possiblemove or a cardontable.
+             */
+            placeCardDiv: function (divid, position) {
+                switch (position.rotation.toString()) {
+                    case "90":
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 4 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + this.cardheight / 2 + 'px');
+                        dojo.style(divid, 'transform', 'rotate(90deg)');
+                        break;
+                    case "180":
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 2 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
+                        dojo.style(divid, 'transform', 'rotate(180deg)');
+                        break;
+                    case "270":
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 4 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight - this.cardheight / 2 + 'px');
+                        dojo.style(divid, 'transform', 'rotate(-90deg)');
+                        break;
+                    default: // no rotation or rotation = 0
+                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 + 'px');
+                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
+                        break;
+                }
             },
 
             ///////////////////////////////////////////////////
@@ -253,78 +289,6 @@ define([
                 }
             },
 
-            /*** Places card card_id on the position {position.x, position.y}, rotated by (position.rotation) degrees
-             * position.rotation can be 0, 90, 180, -90
-             * The left square of the card will be the one placed
-             */
-            placeCard: function (card_id, position) {
-                var backgroundpos_y = (card_id-1) * this.cardheight;
-                dojo.place(
-                    // TODO change jstpl_cardontable because x is always 0
-                    this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
-                    $('map_scrollable_oversurface'));
-
-                var divid = 'cardontable_' + card_id;
-                this.placeCardDiv(divid, position)
-            },
-
-            placeCardDiv: function (divid, position) {
-                switch (position.rotation.toString()) {
-                    case "90":
-                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 4 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight + this.cardheight / 2 + 'px');
-                        dojo.style(divid, 'transform', 'rotate(90deg)');
-                        break;
-                    case "180":
-                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 2 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
-                        dojo.style(divid, 'transform', 'rotate(180deg)');
-                        break;
-                    case "270":
-                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 - this.cardwidth / 4 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight - this.cardheight / 2 + 'px');
-                        dojo.style(divid, 'transform', 'rotate(-90deg)');
-                        break;
-                    default: // no rotation or rotation = 0
-                        dojo.style(divid, 'left', position.x * this.cardwidth / 2 + 'px');
-                        dojo.style(divid, 'top', position.y * this.cardheight + 'px');
-                        break;
-                }
-            },
-            /* Example:
-            
-            onMyMethodToCall1: function( evt )
-            {
-                console.log( 'onMyMethodToCall1' );
-                
-                // Preventing default browser reaction
-                dojo.stopEvent( evt );
-    
-                // Check that this action is possible (see "possibleactions" in states.inc.php)
-                if( ! this.checkAction( 'myAction' ) )
-                {   return; }
-    
-                this.ajaxcall( "/bandido/bandido/myAction.html", { 
-                                                                        lock: true, 
-                                                                        myArgument1: arg1, 
-                                                                        myArgument2: arg2,
-                                                                        ...
-                                                                     }, 
-                             this, function( result ) {
-                                
-                                // What to do after the server call if it succeeded
-                                // (most of the time: nothing)
-                                
-                             }, function( is_error) {
-    
-                                // What to do after the server call in anyway (success or failure)
-                                // (most of the time: nothing)
-    
-                             } );        
-            },        
-            
-            */
-
 
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
@@ -354,7 +318,7 @@ define([
                 }
 
                 this.placeCard(notif.args.card_type,
-                    {x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation});
+                    { x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation });
             },
         });
     });
