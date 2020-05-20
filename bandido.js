@@ -28,8 +28,8 @@ define([
                 console.log('bandido constructor');
 
                 this.scrollmap = new ebg.scrollmap();
-                this.cardwidth = 261;
-                this.cardheight = 134;
+                this.cardwidth = 200;
+                this.cardheight = 100;
             },
 
             /*

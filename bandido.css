@@ -64,23 +64,23 @@
 
 .deck {
     margin-right: 10px;
-    width: 261px;
-    height: 134px;
+    width: 200px;
+    height: 100px;
     background-image: url('img/cards.jpg'); 
     background-position: 0% -6900%;
 }
 
 .cardontable {
     position: absolute;
-    width: 261px;
-    height: 134px;
+    width: 200px;
+    height: 100px;
     background-image: url('img/cards.jpg'); 
 }
 
 .possiblemove {
     position: absolute;
-    width: 261px;
-    height: 134px;
+    width: 200px;
+    height: 100px;
     background-color: white;
     opacity: 0.5; 
 }
