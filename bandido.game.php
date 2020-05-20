@@ -214,6 +214,10 @@ class Bandido extends Table
         // TODO check the card can be played
         $card = $this->cards->getCard($card_id);
 
+        // Location grid is not used to build the actual grid,
+        // it's just to remove the card from the player's hand
+        $this->cards->moveCard($card_id, 'grid');
+
         $cardDrawn = $this->cards->pickCard('deck', $player_id);
 
         // Notify all players about the card played

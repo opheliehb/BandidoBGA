@@ -307,7 +307,7 @@ define([
                 dojo.subscribe('cardPlayed', this, "notif_cardPlayed");
                 dojo.subscribe('cardDrawn', this, "notif_addCardToHand");
             },
-
+            
             notif_cardPlayed: function (notif) {
                 console.log('notif_cardPlayed');
                 console.log(notif);
