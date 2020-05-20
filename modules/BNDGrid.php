@@ -18,13 +18,14 @@ class BNDGrid extends APP_DbObject {
                 self::DbQuery($sqlInsert);
             }
         }
-        // $grid[0][0] = array('card_id' => self::getGameStateValue('supercardId'), 'card' => $this->card[70][0]);
-        // $grid[0][1] = array('card_id' => self::getGameStateValue('supercardId'), 'card' => $this->cards_to_subcards[70][1]);
+        
+        self::placeSubcard(0, 0, "70_0", 0);
+        self::placeSubcard(0, 1, "70_1", 0);
     }
 
-    function placeSubcard($x, $y, $id, $rotation)
+    public static function placeSubcard($x, $y, $id, $rotation)
     {
-        $sqlInsert = sprintf("INSERT INTO grid VALUES ( '%d', '%d', %s, %d )", $x, $y, $id, $rotation);
+        $sqlInsert = sprintf("UPDATE grid SET subcard_id='%s', rotation=%d WHERE x=%d AND y=%d",  $id, $rotation, $x, $y);
         self::DbQuery($sqlInsert);
     }
 }
