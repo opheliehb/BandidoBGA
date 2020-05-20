@@ -1,11 +1,13 @@
 <?php
 
 class BNDGrid extends APP_DbObject {
-    function __construct()
+
+    public static function GetGrid()
     {
         $grid = self::getDoubleKeyCollectionFromDB(
             "SELECT x, y, subcard_id, rotation
-            FROM grid");
+            FROM grid WHERE subcard_id IS NOT NULL");
+        return $grid;
     }
 
     public static function InitializeGrid($supercardId)

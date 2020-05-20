@@ -127,7 +127,7 @@ class Bandido extends Table
         // supercard id
         $result['supercard_id'] = self::getGameStateValue('supercardId');
         
-        $result['grid'] = self::getScrollmapGrid();
+        $result['grid'] = BNDGrid::GetGrid();
 
         return $result;
     }
@@ -170,16 +170,6 @@ class Bandido extends Table
             // Put 7 cards in each player hand
             $this->cards->pickCards(3, 'deck', $player_id);
         }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////
-    //////////// Card placement on map section
-    ////////////   
-
-    function getScrollmapGrid()
-    {
-        $grid = new BNDGrid();
-        return $grid;
     }
 
     //////////////////////////////////////////////////////////////////////////////

@@ -55,9 +55,6 @@ define([
                     // TODO: Setting up players boards if needed
                 }
 
-                // Add supercard in the center of the scrollmap
-                this.placeCard(this.gamedatas.supercard_id, { x: 0, y: 0, rotation: 0 });
-
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
                 this.playerHand.image_items_per_row = 1;
@@ -76,6 +73,8 @@ define([
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
+
+                this.placeCardsOnGrid(this.gamedatas.grid);
 
                 /** Begin scrollmap setup */
                 this.scrollmap.create(
@@ -231,6 +230,21 @@ define([
                 }
             },
 
+            placeCardsOnGrid: function (gridData) {
+                for (var subCardX in gridData) {
+                    for (var subCardY in gridData[subCardX]) {
+                        var subCard = gridData[subCardX][subCardY];
+                        if (subCard.subcard_id.split("_")[1] == '1') {
+                            // We only focus on the left subcard here, placeCard will place both subcards
+                            // and we never have only 1 subcard on the grid
+                            continue;
+                        }
+                        var card_id = subCard.subcard_id.split("_")[0];
+                        this.placeCard(card_id, {x: subCard.x, y: subCard.y, rotation: subCard.rotation});
+                    }
+                }
+            },
+
             ///////////////////////////////////////////////////
             //// Player's action
 
@@ -245,7 +259,7 @@ define([
             
             */
 
-            onDebugPlaceCard: function (evt) {
+            onDebugPlaceCard: function(evt) {
                 dojo.stopEvent(evt);
 
                 var x = -1;
