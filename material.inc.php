@@ -30,7 +30,7 @@
  * (-) null if there is no exit; or
  * (-) a positive integer i, symbolizing a card id, if the exit is linked to card i.
  */
-$this->cards_to_subcards = array(
+$this->cardsDefinition = array(
     0 => [[-1, null, -1],[null, null, null]],
     1 => [[null, -1, null],[-1, null, -1]],
     2 => [[null, -1, null],[-1, null, null]],
