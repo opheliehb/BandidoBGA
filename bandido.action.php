@@ -45,7 +45,14 @@ class action_bandido extends APP_GameAction
     $x = self::getArg("x", AT_int, true);
     $y = self::getArg("y", AT_int, true);
     $rotation = self::getArg("rotation", AT_int, true);
-    $result = $this->game->playCard($cardId, $x, $y, $rotation);
+    $this->game->playCard($cardId, $x, $y, $rotation);
+    self::ajaxResponse();
+  }
+
+  public function changeHand()
+  {
+    self::setAjaxMode();
+    $this->game->changeHand();
     self::ajaxResponse();
   }
 

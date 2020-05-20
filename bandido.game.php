@@ -216,8 +216,27 @@ class Bandido extends Table
             'y' => $y,
             'rotation' => $rotation
         ));
-
+        
+        // Notify active player about the card he's redrawn
         self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
+    }
+
+    function changeHand()
+    {
+        // Check that action is possible for player
+        self::checkAction('changeHand');
+
+        $player_id = self::getActivePlayerId();
+
+        // Move all cards from the player's hand to the bottom of the deck
+        $playerHand = $this->cards->getPlayerHand($player_id);
+        foreach($playerHand as $card) {
+            $this->cards->insertCardOnExtremePosition($card["id"], 'deck', false);
+        }
+
+        // Notify active player about their new cards
+        $newPlayerHand = $this->cards->pickCards(3, 'deck', $player_id);
+        self::notifyPlayer($player_id, "changeHand", "", array('newHand' => $newPlayerHand));
     }
 
 

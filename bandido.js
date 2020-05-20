@@ -174,6 +174,7 @@ define([
                     switch (stateName) {
                         case 'playerTurn':
                             this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
+                            this.addActionButton('debug change hand', _('debugchangehand'), 'onDebugChangeHand');
                             break;
                     }
                 }
@@ -259,6 +260,12 @@ define([
                 dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
             },
 
+            onDebugChangeHand: function (evt) {
+                dojo.stopEvent(evt);
+
+                this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
+            },
+
             onClickPossibleMove: function (evt) {
                 dojo.stopEvent(evt);
                 // Get the cliqued move x and y
@@ -306,8 +313,9 @@ define([
                 console.log('notifications subscriptions setup');
                 dojo.subscribe('cardPlayed', this, "notif_cardPlayed");
                 dojo.subscribe('cardDrawn', this, "notif_addCardToHand");
+                dojo.subscribe('changeHand', this, "notif_changeHand");
             },
-            
+
             notif_cardPlayed: function (notif) {
                 console.log('notif_cardPlayed');
                 console.log(notif);
@@ -327,6 +335,17 @@ define([
                 console.log(notif);
 
                 this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
+            },
+
+            notif_changeHand: function (notif) {
+                console.log('notif_addCardToHand');
+                console.log(notif);
+
+                this.playerHand.removeAllTo('deck');
+                for (var newCardIdx in notif.args.newHand) {
+                    var newCard = notif.args.newHand[newCardIdx];
+                    this.playerHand.addToStockWithId(newCard.type_arg, newCard.id);
+                }
             },
         });
     });
