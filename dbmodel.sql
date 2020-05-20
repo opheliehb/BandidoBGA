@@ -43,4 +43,12 @@ CREATE TABLE IF NOT EXISTS `card` (
   PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `grid` (
+  `y` int(8) NOT NULL,
+  `x` int(8) NOT NULL,
+  `subcard_id` varchar(4),
+  `rotation` int(8),
+  PRIMARY KEY (`x`,`y`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 

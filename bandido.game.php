@@ -19,7 +19,7 @@
 
 
 require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
-
+require_once('modules/BNDGrid.php');
 
 class Bandido extends Table
 {
@@ -93,6 +93,8 @@ class Bandido extends Table
         $this->cards->createCards($cards, 'deck');
         self::dealStartingCards();
 
+        BNDGrid::InitializeGrid(self::getGameStateValue('supercardId'));
+
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
@@ -124,6 +126,8 @@ class Bandido extends Table
 
         // supercard id
         $result['supercard_id'] = self::getGameStateValue('supercardId');
+        
+        $result['grid'] = self::getScrollmapGrid();
 
         return $result;
     }
@@ -174,24 +178,7 @@ class Bandido extends Table
 
     function getScrollmapGrid()
     {
-        $grid = array();
-        // Create all possible lines (and more) to avoid more checks later on
-        for ($x = -69; $x <= 69; $x++) {
-            $grid[$x] = array();
-            for ($y = -69; $y <= 69; $y++) {
-                $grid[$x][$y] = null;
-            }
-        }
-        $grid[0][0] = array('card_id' => self::getGameStateValue('supercardId'), 'card' => $this->cards_to_subcards[70][0]);
-        $grid[0][1] = array('card_id' => self::getGameStateValue('supercardId'), 'card' => $this->cards_to_subcards[70][1]);
-        // $dominoes = self::getCollectionFromDb(
-        //     "SELECT `number`, rotation, horizontal_position x, vertical_position y 
-        //     FROM dominoes 
-        //     WHERE location = 'grid' 
-        //         AND owner_player = $player_id");
-        // foreach ($dominoes as $number => $position) {
-        //     $this->addTogridView($grid, $number, $position);
-        // }
+        $grid = new BNDGrid();
         return $grid;
     }
 
