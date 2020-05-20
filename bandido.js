@@ -305,6 +305,7 @@ define([
             setupNotifications: function () {
                 console.log('notifications subscriptions setup');
                 dojo.subscribe('cardPlayed', this, "notif_cardPlayed");
+                dojo.subscribe('cardDrawn', this, "notif_addCardToHand");
             },
 
             notif_cardPlayed: function (notif) {
@@ -319,6 +320,13 @@ define([
 
                 this.placeCard(notif.args.card_type,
                     { x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation });
+            },
+
+            notif_addCardToHand: function (notif) {
+                console.log('notif_addCardToHand');
+                console.log(notif);
+
+                this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
             },
         });
     });

@@ -121,7 +121,7 @@ class Bandido extends Table
 
         // Cards in player hand      
         $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
-        
+
         // supercard id
         $result['supercard_id'] = self::getGameStateValue('supercardId');
 
@@ -214,6 +214,8 @@ class Bandido extends Table
         // TODO check the card can be played
         $card = $this->cards->getCard($card_id);
 
+        $cardDrawn = $this->cards->pickCard('deck', $player_id);
+
         // Notify all players about the card played
         self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
             'player_id' => $player_id,
@@ -223,6 +225,8 @@ class Bandido extends Table
             'y' => $y,
             'rotation' => $rotation
         ));
+
+        self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
     }
 
 
