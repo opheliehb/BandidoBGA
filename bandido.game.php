@@ -191,6 +191,8 @@ class Bandido extends Table
         // TODO check the card can be played
         $card = $this->cards->getCard($card_id);
 
+        BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
+
         // Location grid is not used to build the actual grid,
         // it's just to remove the card from the player's hand
         $this->cards->moveCard($card_id, 'grid');
@@ -240,23 +242,6 @@ class Bandido extends Table
         game state.
     */
 
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
-    {
-        // Get some values from the current game situation in database...
-    
-        // return values:
-        return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
-        );
-    }    
-    */
-
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
     ////////////
@@ -264,19 +249,6 @@ class Bandido extends Table
     /*
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
-    */
-
-    /*
-    
-    Example for game state "MyGameState":
-
-    function stMyGameState()
-    {
-        // Do some stuff ...
-        
-        // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
-    }    
     */
 
     //////////////////////////////////////////////////////////////////////////////
@@ -337,29 +309,6 @@ class Bandido extends Table
 
     function upgradeTableDb($from_version)
     {
-        // $from_version is the current version of this game database, in numerical form.
-        // For example, if the game was running with a release of your game named "140430-1345",
-        // $from_version is equal to 1404301345
-
-        // Example:
-        //        if( $from_version <= 1404301345 )
-        //        {
-        //            // ! important ! Use DBPREFIX_<table_name> for all tables
-        //
-        //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-        //            self::applyDbUpgradeToAllDB( $sql );
-        //        }
-        //        if( $from_version <= 1405061421 )
-        //        {
-        //            // ! important ! Use DBPREFIX_<table_name> for all tables
-        //
-        //            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
-        //            self::applyDbUpgradeToAllDB( $sql );
-        //        }
-        //        // Please add your future database scheme changes here
-        //
-        //
-
 
     }
 }

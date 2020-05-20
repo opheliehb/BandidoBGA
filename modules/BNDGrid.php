@@ -21,11 +21,33 @@ class BNDGrid extends APP_DbObject {
             }
         }
         
-        self::placeSubcard(0, 0, "70_0", 0);
-        self::placeSubcard(0, 1, "70_1", 0);
+        self::placeSubcard("70_0", 0, 0, 0);
+        self::placeSubcard("70_1", 0, 1, 0);
     }
 
-    public static function placeSubcard($x, $y, $id, $rotation)
+    public static function placeCard($id, $x, $y, $rotation)
+    {
+        switch($rotation) {
+            case 0:
+                self::placeSubcard($id."_0", $x, $y, $rotation);
+                self::placeSubcard($id."_1", $x + 1, $y, $rotation);
+                break;
+            case 90:
+                self::placeSubcard($id."_0", $x, $y, $rotation);
+                self::placeSubcard($id."_1", $x, $y + 1, $rotation);
+                break;
+            case 180:
+                self::placeSubcard($id."_0", $x, $y, $rotation);
+                self::placeSubcard($id."_1", $x - 1, $y, $rotation);
+                break;
+            case 270:
+                self::placeSubcard($id."_0", $x, $y, $rotation);
+                self::placeSubcard($id."_1", $x, $y - 1, $rotation);
+                break;
+        }
+    }
+
+    public static function placeSubcard($id, $x, $y, $rotation)
     {
         $sqlInsert = sprintf("UPDATE grid SET subcard_id='%s', rotation=%d WHERE x=%d AND y=%d",  $id, $rotation, $x, $y);
         self::DbQuery($sqlInsert);
