@@ -29,5 +29,18 @@ class BNDSubcard
         $this->_bottom = $bottom;
     }
 
+    function get90rotation($subcard)
+    {
+        return array($subcard[2], $subcard[3], $subcard[1], $subcard[0]);
+    }
     
+    function get180rotation($subcard)
+    {
+        return array($subcard[1], $subcard[0], $subcard[3], $subcard[2]);
+    }
+    
+    function get270rotation($subcard)
+    {
+        return array($subcard[3], $subcard[2], $subcard[0], $subcard[1]);
+    }
 }

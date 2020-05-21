@@ -20,6 +20,7 @@
 
 require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
 require_once('modules/BNDGrid.php');
+require_once('modules/BNDCard.php');
 
 class Bandido extends Table
 {
@@ -158,72 +159,116 @@ class Bandido extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
+    function testExitMatchesNeighbors($currentCardExit, $neighborCard, $neighborCardIdx)
+    {
+        $canBePlaced = true;
+        list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
+
+        if ($currentCardExit == null) {
+            // if there is no exit for the current card, the neighbor card musn't have exits either
+            $neighborHasExit = $this->cardExits[$neighborCard_id][$neighborSubcard_id][$neighborCardIdx] != null;
+            $canBePlaced = $canBePlaced && !$neighborHasExit;
+        } else {
+            // if there is no exit for the current card, the neighbor card must have a free exit to match
+            $canBePlaced = $canBePlaced && $this->cardExits[$neighborCard_id][$neighborSubcard_id][$neighborCardIdx] == -1;
+        }
+        return $canBePlaced;
+    }
+
     function testExits($currentCardExits, $x, $y)
     {
         $canBePlaced = true;
+        $hasAtLeastOneNeighbor = false;
         $grid = BNDGrid::GetFullGrid();
 
-        // right
-        $neighborCard = $grid[$x + 1][$y]["subcard_id"];
-        if($neighborCard != null)
-        {
-            // if there is no exit to the right for the current card
-            if ($currentCardExits[1] == null) {
-                return false;
-            } else {
-                // can be placed if there is an exit to the left 
-                // in the card on the right
-                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
-                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][0] == -1;
-            }
+        // left
+        $leftNeighbor = $grid[$x - 1][$y]["subcard_id"];
+        if ($leftNeighbor != null) {
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced && self::testExitMatchesNeighbors($currentCardExits[0], $leftNeighbor, 1);
         }
 
-        // left
-        $neighborCard = $grid[$x - 1][$y]["subcard_id"];
-        if($neighborCard != null)
-        {
-            if ($currentCardExits[0] == null) {
-                return false;
-            } else {
-                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
-                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][1] == -1;
-            }
+        // right
+        $rightNeighbor = $grid[$x + 1][$y]["subcard_id"];
+        if ($rightNeighbor != null) {
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced && self::testExitMatchesNeighbors($currentCardExits[1], $rightNeighbor, 0);
         }
 
         // top
-        $neighborCard = $grid[$x][$y + 1]["subcard_id"];
-        if($neighborCard != null)
-        {
-            if ($currentCardExits[2] == null) {
-                return false;
-            } else {
-                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
-                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][3] == -1;
-            }
+        $topNeighbor = $grid[$x][$y - 1]["subcard_id"];
+        if ($topNeighbor != null) {
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced && self::testExitMatchesNeighbors($currentCardExits[2], $topNeighbor, 3);
         }
 
         // bottom
-        $neighborCard = $grid[$x][$y + 1]["subcard_id"];
-        if($neighborCard != null)
-        {
-            if ($currentCardExits[3] == null) {
-                return false;
-            } else {
-                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
-                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][2] == -1;
-            }
+        $bottomNeighbor = $grid[$x][$y + 1]["subcard_id"];
+        if ($bottomNeighbor != null) {
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced && self::testExitMatchesNeighbors($currentCardExits[3], $bottomNeighbor, 2);
         }
 
-        return $canBePlaced;
+        return array($canBePlaced, $hasAtLeastOneNeighbor);
     }
 
     function cardCanBePlaced($id, $x, $y, $rotation)
     {
-        switch($rotation) {
-            case 0:
-                return self::testExits($this->cardExits[$id][0], $x, $y) && self::testExits($this->cardExits[$id][1], $x + 1, $y);
-            break;
+        $grid = BNDGrid::GetFullGrid();
+        if ($grid[$x][$y]["subcard_id"] != null) {
+            return false;
         }
+
+        $subcard_0 = null;
+        $subcard_1 = null;
+        switch ($rotation) {
+            case 0:
+                // Check that the grid is empty where we want to place the card
+                if ($grid[$x + 1][$y]["subcard_id"] != null) {
+                    return false;
+                }
+
+                // Check if the subcards exits match their neighbor's and if they have at least 1 neighbor
+                $subcard_0 = $this->cardExits[$id][0];
+                $subcard_1 = $this->cardExits[$id][1];
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y);
+                break;
+            case 90:
+                if ($grid[$x][$y + 1]["subcard_id"] != null) {
+                    return false;
+                }
+
+                $subcard_0 = BNDSubcard::get90rotation($this->cardExits[$id][0]);
+                $subcard_1 = BNDSubcard::get90rotation($this->cardExits[$id][1]);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y + 1);
+                break;
+            case 180:
+                if ($grid[$x - 1][$y]["subcard_id"] != null) {
+                    return false;
+                }
+
+                $subcard_0 = BNDSubcard::get180rotation($this->cardExits[$id][0]);
+                $subcard_1 = BNDSubcard::get180rotation($this->cardExits[$id][1]);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x - 1, $y);
+                break;
+            case 270:
+                if ($grid[$x][$y - 1]["subcard_id"] != null) {
+                    return false;
+                }
+
+                $subcard_0 = BNDSubcard::get270rotation($this->cardExits[$id][0]);
+                $subcard_1 = BNDSubcard::get270rotation($this->cardExits[$id][1]);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y - 1);
+                break;
+        }
+
+        return ($firstSubcardCanBePlaced &&
+            $secondSubcardCanBePlaced &&
+            ($firstSubcardHasNeighbor || $secondSubcardHasNeighbor));
     }
 
     function dealStartingCards()
@@ -259,29 +304,31 @@ class Bandido extends Table
         // TODO check the card can be played
         $card = $this->cards->getCard($card_id);
 
-        if (self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation)) {
-            BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
-
-
-            // Location grid is not used to build the actual grid,
-            // it's just to remove the card from the player's hand
-            $this->cards->moveCard($card_id, 'grid');
-
-            $cardDrawn = $this->cards->pickCard('deck', $player_id);
-
-            // Notify all players about the card played
-            self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
-                'player_id' => $player_id,
-                'player_name' => self::getActivePlayerName(),
-                'card_type' => $card['type_arg'],
-                'x' => $x,
-                'y' => $y,
-                'rotation' => $rotation
-            ));
-
-            // Notify active player about the card he's redrawn
-            self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
+        if (!self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation)) {
+            throw new feException("Invalid card placement!");
         }
+
+        BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
+
+
+        // Location grid is not used to build the actual grid,
+        // it's just to remove the card from the player's hand
+        $this->cards->moveCard($card_id, 'grid');
+
+        $cardDrawn = $this->cards->pickCard('deck', $player_id);
+
+        // Notify all players about the card played
+        self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
+            'player_id' => $player_id,
+            'player_name' => self::getActivePlayerName(),
+            'card_type' => $card['type_arg'],
+            'x' => $x,
+            'y' => $y,
+            'rotation' => $rotation
+        ));
+
+        // Notify active player about the card he's redrawn
+        self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
     }
 
     function changeHand()

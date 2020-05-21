@@ -262,9 +262,9 @@ define([
             onDebugPlaceCard: function(evt) {
                 dojo.stopEvent(evt);
 
-                var x = 0;
-                var y = -1;
-                var rotation = 0;
+                var x = -1;
+                var y = 0;
+                var rotation = 90;
 
                 dojo.place(
                     "<div id=" + this.getPossibleMoveId(x, y, rotation) + " class=possiblemove></div>",

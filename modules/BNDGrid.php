@@ -30,7 +30,7 @@ class BNDGrid extends APP_DbObject {
         }
         
         self::placeSubcard("70_0", 0, 0, 0);
-        self::placeSubcard("70_1", 0, 1, 0);
+        self::placeSubcard("70_1", 1, 0, 0);
     }
 
     public static function placeCard($id, $x, $y, $rotation)
