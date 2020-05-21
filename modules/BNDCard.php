@@ -31,16 +31,33 @@ class BNDSubcard
 
     function get90rotation($subcard)
     {
-        return array($subcard[2], $subcard[3], $subcard[1], $subcard[0]);
+        return self::getRotation($subcard, 90);
     }
     
     function get180rotation($subcard)
     {
-        return array($subcard[1], $subcard[0], $subcard[3], $subcard[2]);
+        return self::getRotation($subcard, 180);
     }
     
     function get270rotation($subcard)
     {
-        return array($subcard[3], $subcard[2], $subcard[0], $subcard[1]);
+        return self::getRotation($subcard, 270);
+    }
+
+    function getRotation($subcard, $rotation) {
+        switch ($rotation) {
+            case 0:
+                return $subcard;
+            break;
+            case 90:
+                return array($subcard[0], $subcard[2], $subcard[0], $subcard[1]);
+            break;
+            case 180:
+                return array($subcard[1], $subcard[0], $subcard[3], $subcard[2]);
+            break;
+            case 270:
+                return array($subcard[2], $subcard[3], $subcard[1], $subcard[0]);
+            break;
+        }
     }
 }
