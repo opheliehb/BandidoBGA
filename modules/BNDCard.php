@@ -1,4 +1,5 @@
 <?php
+require_once('BNDExitMap.php');
 
 class BNDCard
 {
@@ -21,27 +22,23 @@ class BNDSubcard
     var $_top;
     var $_bottom;
 
-    function __construct($left, $right, $top, $bottom)
+    function __construct($subcard_id, $rotation)
     {
-        $this->_left = $left;
-        $this->_right = $right;
-        $this->_top = $top;
-        $this->_bottom = $bottom;
+        $this->_card_id = $subcard_id;
+        $origExits = BNDExitMap::get($this->_card_id);
+        $exits = self::getRotation($origExits, $rotation);
+        $this->_left = $exits[0];
+        $this->_right = $exits[1];
+        $this->_top = $exits[2];
+        $this->_bottom = $exits[3];
     }
 
-    function get90rotation($subcard)
+    function getSubcard($dbsubcard)
     {
-        return self::getRotation($subcard, 90);
-    }
-    
-    function get180rotation($subcard)
-    {
-        return self::getRotation($subcard, 180);
-    }
-    
-    function get270rotation($subcard)
-    {
-        return self::getRotation($subcard, 270);
+        if ($dbsubcard["subcard_id"]) {
+            return new self($dbsubcard["subcard_id"], $dbsubcard["rotation"]);
+        }
+        return null;
     }
 
     function getRotation($subcard, $rotation) {

@@ -1,7 +1,8 @@
 <?php
+require_once('BNDCard.php');
 
 class BNDGrid extends APP_DbObject {
-
+    
     public static function GetGrid()
     {
         $grid = self::getDoubleKeyCollectionFromDB(
@@ -54,10 +55,43 @@ class BNDGrid extends APP_DbObject {
                 break;
         }
     }
-
+    
     public static function placeSubcard($id, $x, $y, $rotation)
     {
         $sqlInsert = sprintf("UPDATE grid SET subcard_id='%s', rotation=%d WHERE x=%d AND y=%d",  $id, $rotation, $x, $y);
         self::DbQuery($sqlInsert);
+    }
+
+    public static function getPlayableLocationsFromCard($subcard, $x, $y)
+    {
+        $playableLocations = array();
+
+        if ($subcard->_left == -1) {
+            array_merge($playableLocations, array($x - 1, $y));
+        }
+        if ($subcard->_right == -1) {
+            array_merge($playableLocations, array($x + 1, $y));
+        }
+        if ($subcard->_top == -1) {
+            array_merge($playableLocations, array($x, $y - 1));
+        }
+        if ($subcard->_bottom == - 1) {
+            array_merge($playableLocations, array($x, $y + 1));
+        }
+        return $playableLocations;
+    }
+
+    public static function getPlayableLocations()
+    {
+        $listOfPlayableLocations = array();
+        $grid = self::GetGrid();
+        foreach ($grid as $x => $gridXCoord) {
+            foreach ($gridXCoord as $y => $dbsubcard) {
+                $subcard = BNDSubcard::getSubcard($dbsubcard);
+                $locations = self::getPlayableLocationsFromCard($subcard, $x, $y);
+                array_merge($listOfPlayableLocations, $locations);
+            }
+        }
+        return $listOfPlayableLocations;
     }
 }

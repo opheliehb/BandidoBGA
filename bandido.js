@@ -30,6 +30,7 @@ define([
                 this.scrollmap = new ebg.scrollmap();
                 this.cardwidth = 200;
                 this.cardheight = 100;
+                this.cardRotation = 0;
             },
 
             /*
@@ -70,6 +71,7 @@ define([
                     this.playerHand.addToStockWithId(card.type_arg, card.id);
                 }
                 this.playerHand.setSelectionMode(1);
+                dojo.connect(this.playerHand, 'onChangeSelection', this, 'onSelectCard');
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -240,7 +242,7 @@ define([
                             continue;
                         }
                         var card_id = subCard.subcard_id.split("_")[0];
-                        this.placeCard(card_id, {x: subCard.x, y: subCard.y, rotation: subCard.rotation});
+                        this.placeCard(card_id, { x: subCard.x, y: subCard.y, rotation: subCard.rotation });
                     }
                 }
             },
@@ -259,7 +261,7 @@ define([
             
             */
 
-            onDebugPlaceCard: function(evt) {
+            onDebugPlaceCard: function (evt) {
                 dojo.stopEvent(evt);
 
                 var x = 0;
@@ -278,6 +280,20 @@ define([
                 dojo.stopEvent(evt);
 
                 this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
+            },
+
+            onSelectCard: function (control_name, item_id) {
+                var cards = this.playerHand.getSelectedItems();
+                if (cards == []) {
+                    //this.clearPossibleMoves();
+                    return;
+                }
+                var card = cards[0];
+
+                this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
+                    rotation: this.cardRotation,
+                    cardId: card.id,
+                }, this, function (result) { });
             },
 
             onClickPossibleMove: function (evt) {
