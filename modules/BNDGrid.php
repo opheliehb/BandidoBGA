@@ -10,6 +10,14 @@ class BNDGrid extends APP_DbObject {
         return $grid;
     }
 
+    public static function GetFullGrid()
+    {
+        $grid = self::getDoubleKeyCollectionFromDB(
+            "SELECT x, y, subcard_id, rotation
+            FROM grid");
+        return $grid;
+    }
+
     public static function InitializeGrid($supercardId)
     {
         // TODO add supercard at start

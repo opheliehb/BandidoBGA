@@ -126,7 +126,7 @@ class Bandido extends Table
 
         // supercard id
         $result['supercard_id'] = self::getGameStateValue('supercardId');
-        
+
         $result['grid'] = BNDGrid::GetGrid();
 
         return $result;
@@ -157,6 +157,74 @@ class Bandido extends Table
     /*
         In this space, you can put any utility methods useful for your game logic
     */
+
+    function testExits($currentCardExits, $x, $y)
+    {
+        $canBePlaced = true;
+        $grid = BNDGrid::GetFullGrid();
+
+        // right
+        $neighborCard = $grid[$x + 1][$y]["subcard_id"];
+        if($neighborCard != null)
+        {
+            // if there is no exit to the right for the current card
+            if ($currentCardExits[1] == null) {
+                return false;
+            } else {
+                // can be placed if there is an exit to the left 
+                // in the card on the right
+                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
+                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][0] == -1;
+            }
+        }
+
+        // left
+        $neighborCard = $grid[$x - 1][$y]["subcard_id"];
+        if($neighborCard != null)
+        {
+            if ($currentCardExits[0] == null) {
+                return false;
+            } else {
+                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
+                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][1] == -1;
+            }
+        }
+
+        // top
+        $neighborCard = $grid[$x][$y + 1]["subcard_id"];
+        if($neighborCard != null)
+        {
+            if ($currentCardExits[2] == null) {
+                return false;
+            } else {
+                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
+                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][3] == -1;
+            }
+        }
+
+        // bottom
+        $neighborCard = $grid[$x][$y + 1]["subcard_id"];
+        if($neighborCard != null)
+        {
+            if ($currentCardExits[3] == null) {
+                return false;
+            } else {
+                list($neighborCard_id, $neighborSubcard_id) = explode('_', $neighborCard);
+                $canBePlaced &= $this->cardExits[$neighborCard_id][$neighborSubcard_id][2] == -1;
+            }
+        }
+
+        return $canBePlaced;
+    }
+
+    function cardCanBePlaced($id, $x, $y, $rotation)
+    {
+        switch($rotation) {
+            case 0:
+                return self::testExits($this->cardExits[$id][0], $x, $y) && self::testExits($this->cardExits[$id][1], $x + 1, $y);
+            break;
+        }
+    }
 
     function dealStartingCards()
     {
@@ -191,26 +259,29 @@ class Bandido extends Table
         // TODO check the card can be played
         $card = $this->cards->getCard($card_id);
 
-        BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
+        if (self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation)) {
+            BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
 
-        // Location grid is not used to build the actual grid,
-        // it's just to remove the card from the player's hand
-        $this->cards->moveCard($card_id, 'grid');
 
-        $cardDrawn = $this->cards->pickCard('deck', $player_id);
+            // Location grid is not used to build the actual grid,
+            // it's just to remove the card from the player's hand
+            $this->cards->moveCard($card_id, 'grid');
 
-        // Notify all players about the card played
-        self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
-            'player_id' => $player_id,
-            'player_name' => self::getActivePlayerName(),
-            'card_type' => $card['type_arg'],
-            'x' => $x,
-            'y' => $y,
-            'rotation' => $rotation
-        ));
-        
-        // Notify active player about the card he's redrawn
-        self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
+            $cardDrawn = $this->cards->pickCard('deck', $player_id);
+
+            // Notify all players about the card played
+            self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
+                'player_id' => $player_id,
+                'player_name' => self::getActivePlayerName(),
+                'card_type' => $card['type_arg'],
+                'x' => $x,
+                'y' => $y,
+                'rotation' => $rotation
+            ));
+
+            // Notify active player about the card he's redrawn
+            self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
+        }
     }
 
     function changeHand()
@@ -222,7 +293,7 @@ class Bandido extends Table
 
         // Move all cards from the player's hand to the bottom of the deck
         $playerHand = $this->cards->getPlayerHand($player_id);
-        foreach($playerHand as $card) {
+        foreach ($playerHand as $card) {
             $this->cards->insertCardOnExtremePosition($card["id"], 'deck', false);
         }
 
@@ -309,6 +380,5 @@ class Bandido extends Table
 
     function upgradeTableDb($from_version)
     {
-
     }
 }
