@@ -284,8 +284,8 @@ define([
 
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
-                if (cards == []) {
-                    //this.clearPossibleMoves();
+                if (cards.length === 0) {
+                    dojo.query('.possiblemove').forEach(dojo.destroy);
                     return;
                 }
                 var card = cards[0];
@@ -353,7 +353,7 @@ define([
 
                 for (var idx in notif.args.possibleMoves) {
                     var possibleMove = notif.args.possibleMoves[idx];
-                    
+
                     var x = possibleMove[0];
                     var y = possibleMove[1];
 
@@ -374,6 +374,8 @@ define([
                     this.playerHand.removeFromStock(
                         notif.args.card_type,
                         this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation));
+
+                    dojo.query('.possiblemove').forEach(dojo.destroy);
                 }
 
                 this.placeCard(notif.args.card_type,
