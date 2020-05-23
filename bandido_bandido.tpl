@@ -63,6 +63,10 @@
                               style="background-position:-${x}px -${y}px">\
                             </div>';
 
+    var jstpl_rotateleft = '<img src="{GAMETHEMEURL}img/rotate.svg" \
+                                class="manipulation-arrow rotate-left"/>';
+    var jstpl_rotateright = '<img src="{GAMETHEMEURL}img/rotate.svg" \
+                                class="manipulation-arrow rotate-right anticlockwise"/>';
 </script>
 
 {OVERALL_GAME_FOOTER}

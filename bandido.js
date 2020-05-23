@@ -31,6 +31,7 @@ define([
                 this.cardwidth = 200;
                 this.cardheight = 100;
                 this.cardRotation = 0;
+                this.card = null;
             },
 
             /*
@@ -247,6 +248,44 @@ define([
                 }
             },
 
+            /***
+             * Clears the possible moves displayed then recomputes them.
+             * Takes into account card and rotation.
+             */
+            computePossibleMoves: function (evt) {
+                dojo.query('.possiblemove').forEach(dojo.destroy);
+                this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
+                    rotation: this.cardRotation,
+                    cardId: this.card.id,
+                }, this, function (result) { });
+            },
+
+            rotateLeft: function () {
+                if (this.card == null) {
+                    return;
+                }
+                switch(this.cardRotation) {
+                    case 0:
+                        this.cardRotation = 270;
+                        break;
+                    default:
+                        this.cardRotation -= 90;
+                }
+            },
+
+            rotateRight: function () {
+                if (this.card == null) {
+                    return;
+                }
+                switch(this.cardRotation) {
+                    case 270:
+                        this.cardRotation = 0;
+                        break;
+                    default:
+                        this.cardRotation += 90;
+                }
+            },
+
             ///////////////////////////////////////////////////
             //// Player's action
 
@@ -285,15 +324,34 @@ define([
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
                 if (cards.length === 0) {
+                    // Clear arrows on card and possible moves, reset this.card and this.rotation
                     dojo.query('.possiblemove').forEach(dojo.destroy);
+                    dojo.query('.manipulation-arrow').forEach(dojo.destroy);
+                    this.card = null;
+                    this.cardRotation = 0;
                     return;
                 }
-                var card = cards[0];
+                this.card = cards[0];
 
-                this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
-                    rotation: this.cardRotation,
-                    cardId: card.id,
-                }, this, function (result) { });
+                // Place arrows on card
+                var divId = this.playerHand.getItemDivId(item_id);
+                dojo.place(this.format_block('jstpl_rotateleft', {}), $(divId));
+                dojo.place(this.format_block('jstpl_rotateright', {}), $(divId));
+                dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
+
+                this.computePossibleMoves();
+            },
+            
+            // Rotates card according to the arrow clicked
+            onClickRotateCard: function (evt) {
+                dojo.stopEvent(evt);
+                if (dojo.hasClass(evt.currentTarget, "rotate-left")) {
+                    this.rotateLeft();
+                }
+                else {
+                    this.rotateRight();
+                }
+                this.computePossibleMoves();
             },
 
             onClickPossibleMove: function (evt) {
