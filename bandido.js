@@ -341,9 +341,29 @@ define([
             */
             setupNotifications: function () {
                 console.log('notifications subscriptions setup');
+                dojo.subscribe('possibleMoves', this, "notif_possibleMoves");
                 dojo.subscribe('cardPlayed', this, "notif_cardPlayed");
                 dojo.subscribe('cardDrawn', this, "notif_addCardToHand");
                 dojo.subscribe('changeHand', this, "notif_changeHand");
+            },
+
+            notif_possibleMoves: function (notif) {
+                console.log('notif_cardPlayed');
+                console.log(notif);
+
+                for (var idx in notif.args.possibleMoves) {
+                    var possibleMove = notif.args.possibleMoves[idx];
+                    
+                    var x = possibleMove[0];
+                    var y = possibleMove[1];
+
+                    dojo.place(
+                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotation) + " class=possiblemove></div>",
+                        $('map_scrollable_oversurface'));
+                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotation), { x: x, y: y, rotation: this.cardRotation });
+                }
+
+                dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
             },
 
             notif_cardPlayed: function (notif) {

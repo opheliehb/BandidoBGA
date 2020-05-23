@@ -2,7 +2,7 @@
 
 class BNDExitMap {
 
-    var $_exits = array(
+    public static $_exits = array(
         0 => [[-1, null, null, -1],[null, null, null, null]],
         1 => [[null, null, -1, null],[null, null, -1, -1]],
         2 => [[null, null, -1, null],[null, null, -1, null]],
@@ -80,7 +80,7 @@ class BNDExitMap {
     public static function get($dbsubcard_id)
     {
         list($card_id, $subcard_id) = explode('_', $dbsubcard_id);
-        return $this->_exits[$card_id][$subcard_id];
+        return self::$_exits[$card_id][$subcard_id];
     }
 
 }
