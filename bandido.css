@@ -85,6 +85,10 @@
     opacity: 0.5; 
 }
 
+.possiblemove:hover {
+    background-image: url('img/cards.jpg');
+}
+
 /** Begin arrow classes */
 .manipulation-arrow {
     background-color: white

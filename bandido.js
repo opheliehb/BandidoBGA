@@ -288,7 +288,7 @@ define([
                 if (this.card == null) {
                     return;
                 }
-                switch(this.cardRotations[this.card.id]) {
+                switch (this.cardRotations[this.card.id]) {
                     case 0:
                     case 180:
                         dojo.style(cardElement, 'top', '50px');
@@ -364,7 +364,7 @@ define([
 
                 this.computePossibleMoves();
             },
-            
+
             // Rotates card according to the arrow clicked
             onClickRotateCard: function (evt) {
                 dojo.stopEvent(evt);
@@ -439,9 +439,13 @@ define([
                     var y = possibleMove[1];
 
                     dojo.place(
-                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]) + " class=possiblemove></div>",
-                        $('map_scrollable_oversurface'));
-                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]), { x: x, y: y, rotation: this.cardRotations[this.card.id] });
+                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]) +
+                        " class=possiblemove style=\"background-position:0px -" +
+                        this.card.type * this.cardheight + "px\"></div>",
+                        $('map_scrollable_oversurface')
+                    );
+                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]),
+                        { x: x, y: y, rotation: this.cardRotations[this.card.id] });
                 }
 
                 dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
