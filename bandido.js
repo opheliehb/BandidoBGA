@@ -30,7 +30,7 @@ define([
                 this.scrollmap = new ebg.scrollmap();
                 this.cardwidth = 200;
                 this.cardheight = 100;
-                this.cardRotation = 0;
+                this.cardRotations = {};
                 this.card = null;
             },
 
@@ -70,6 +70,7 @@ define([
                 for (var i in this.gamedatas.hand) {
                     var card = this.gamedatas.hand[i];
                     this.playerHand.addToStockWithId(card.type_arg, card.id);
+                    this.cardRotations[card.id] = 0;
                 }
                 this.playerHand.setSelectionMode(1);
                 dojo.connect(this.playerHand, 'onChangeSelection', this, 'onSelectCard');
@@ -255,35 +256,37 @@ define([
             computePossibleMoves: function (evt) {
                 dojo.query('.possiblemove').forEach(dojo.destroy);
                 this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
-                    rotation: this.cardRotation,
+                    rotation: this.cardRotations[this.card.id],
                     cardId: this.card.id,
                 }, this, function (result) { });
             },
 
-            rotateLeft: function () {
+            rotateLeft: function (cardElement) {
                 if (this.card == null) {
                     return;
                 }
-                switch(this.cardRotation) {
+                switch(this.cardRotations[this.card.id]) {
                     case 0:
-                        this.cardRotation = 270;
+                        this.cardRotations[this.card.id] = 270;
                         break;
                     default:
-                        this.cardRotation -= 90;
+                        this.cardRotations[this.card.id] -= 90;
                 }
+                dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
             },
 
-            rotateRight: function () {
+            rotateRight: function (cardElement) {
                 if (this.card == null) {
                     return;
                 }
-                switch(this.cardRotation) {
+                switch(this.cardRotations[this.card.id]) {
                     case 270:
-                        this.cardRotation = 0;
+                        this.cardRotations[this.card.id] = 0;
                         break;
                     default:
-                        this.cardRotation += 90;
+                        this.cardRotations[this.card.id] += 90;
                 }
+                dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
             },
 
             ///////////////////////////////////////////////////
@@ -328,7 +331,6 @@ define([
                     dojo.query('.possiblemove').forEach(dojo.destroy);
                     dojo.query('.manipulation-arrow').forEach(dojo.destroy);
                     this.card = null;
-                    this.cardRotation = 0;
                     return;
                 }
                 this.card = cards[0];
@@ -346,10 +348,10 @@ define([
             onClickRotateCard: function (evt) {
                 dojo.stopEvent(evt);
                 if (dojo.hasClass(evt.currentTarget, "rotate-left")) {
-                    this.rotateLeft();
+                    this.rotateLeft(evt.currentTarget.offsetParent);
                 }
                 else {
-                    this.rotateRight();
+                    this.rotateRight(evt.currentTarget.offsetParent);
                 }
                 this.computePossibleMoves();
             },
@@ -416,9 +418,9 @@ define([
                     var y = possibleMove[1];
 
                     dojo.place(
-                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotation) + " class=possiblemove></div>",
+                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]) + " class=possiblemove></div>",
                         $('map_scrollable_oversurface'));
-                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotation), { x: x, y: y, rotation: this.cardRotation });
+                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]), { x: x, y: y, rotation: this.cardRotations[this.card.id] });
                 }
 
                 dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
@@ -445,6 +447,7 @@ define([
                 console.log(notif);
 
                 this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
+                this.cardRotations[notif.args.cardDrawn.id] = 0;
             },
 
             notif_changeHand: function (notif) {
