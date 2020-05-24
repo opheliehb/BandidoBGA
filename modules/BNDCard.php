@@ -47,7 +47,7 @@ class BNDSubcard
                 return $subcard;
             break;
             case 90:
-                return array($subcard[0], $subcard[2], $subcard[0], $subcard[1]);
+                return array($subcard[3], $subcard[2], $subcard[0], $subcard[1]);
             break;
             case 180:
                 return array($subcard[1], $subcard[0], $subcard[3], $subcard[2]);

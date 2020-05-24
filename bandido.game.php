@@ -186,7 +186,12 @@ class Bandido extends Table
         }
 
         $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
+        // var_dump($rightNeighborSubcard);
         if ($rightNeighborSubcard != null) {
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_right);
+            // var_dump("RIGHT NEIG");
+            // var_dump($rightNeighborSubcard->_left);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_right, $rightNeighborSubcard->_left);
