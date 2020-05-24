@@ -70,7 +70,7 @@ class BNDExitMap {
         64 => [[-1, null, null, null],[null, null, null, null]],
         65 => [[null, null, null, null],[null, -1, null, null]],
         66 => [[-1, null, null, null],[null, -1, -1, null]],
-        67 => [[-1, null, -1, -1],[null, null, null, null]],
+        67 => [[-1, null, -1, null],[null, -1, null, null]],
         68 => [[-1, null, -1, null],[null, null, null, null]],
         69 => [[null, null, null, null],[null, null, null, null]],
         70 => [[-1, null, -1, -1],[null, -1, -1, -1]],

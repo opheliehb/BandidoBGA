@@ -388,7 +388,7 @@ class Bandido extends Table
             $other_location = self::getPlayableLocationFotOtherSubcard($location[0], $location[1], $rotation);
             // var_dump("Testing other location :");
             // var_dump($other_location);
-            if($canBePlaced = self::cardCanBePlaced($card['type_arg'], $other_location[0], $other_location[1], $rotation, $grid))
+            if(self::cardCanBePlaced($card['type_arg'], $other_location[0], $other_location[1], $rotation, $grid))
             {
                 // var_dump("Card can be placed");
                 array_push($possibleMoves, $other_location);
