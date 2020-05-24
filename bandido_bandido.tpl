@@ -64,9 +64,11 @@
                             </div>';
 
     var jstpl_rotateleft = '<img src="{GAMETHEMEURL}img/rotate.svg" \
-                                class="manipulation-arrow rotate-left"/>';
+                                class="manipulation-arrow rotate-left"\
+                                style="position: absolute; left: ${left}px;"/>';
     var jstpl_rotateright = '<img src="{GAMETHEMEURL}img/rotate.svg" \
-                                class="manipulation-arrow rotate-right anticlockwise"/>';
+                                class="manipulation-arrow rotate-right anticlockwise"\
+                                style="position: absolute; left: ${left}px;"/>';
 </script>
 
 {OVERALL_GAME_FOOTER}

@@ -16,7 +16,8 @@
  */
 
 define([
-    "dojo", "dojo/_base/declare",
+    "dojo", 
+    "dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter",
     "ebg/scrollmap",
@@ -32,6 +33,8 @@ define([
                 this.cardheight = 100;
                 this.cardRotations = {};
                 this.card = null;
+
+                dojo.require("dojo.NodeList-traverse");
             },
 
             /*
@@ -266,10 +269,16 @@ define([
                     return;
                 }
                 switch(this.cardRotations[this.card.id]) {
+                    case 180:
+                        dojo.style(cardElement, 'top', '50px');
+                        this.cardRotations[this.card.id] -= 90;
+                        break;
                     case 0:
+                        dojo.style(cardElement, 'top', '50px');
                         this.cardRotations[this.card.id] = 270;
                         break;
                     default:
+                        dojo.style(cardElement, 'top', '0px');
                         this.cardRotations[this.card.id] -= 90;
                 }
                 dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
@@ -280,10 +289,17 @@ define([
                     return;
                 }
                 switch(this.cardRotations[this.card.id]) {
+                    case 0:
+                    case 180:
+                        dojo.style(cardElement, 'top', '50px');
+                        this.cardRotations[this.card.id] += 90;
+                        break;
                     case 270:
+                        dojo.style(cardElement, 'top', '0px');
                         this.cardRotations[this.card.id] = 0;
                         break;
                     default:
+                        dojo.style(cardElement, 'top', '0px');
                         this.cardRotations[this.card.id] += 90;
                 }
                 dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
@@ -337,8 +353,13 @@ define([
 
                 // Place arrows on card
                 var divId = this.playerHand.getItemDivId(item_id);
-                dojo.place(this.format_block('jstpl_rotateleft', {}), $(divId));
-                dojo.place(this.format_block('jstpl_rotateright', {}), $(divId));
+                var cardDiv = dojo.query("#" + divId);
+                var leftPos = parseInt(cardDiv[0].style.left, 10) + this.cardwidth/2;
+
+                this.divIdToRotate = divId;
+                // 24 is the rotate image size
+                dojo.place(this.format_block('jstpl_rotateleft', {left: leftPos - 24}), $("playerhand"));
+                dojo.place(this.format_block('jstpl_rotateright', {left: leftPos}), $("playerhand"));
                 dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
 
                 this.computePossibleMoves();
@@ -348,10 +369,10 @@ define([
             onClickRotateCard: function (evt) {
                 dojo.stopEvent(evt);
                 if (dojo.hasClass(evt.currentTarget, "rotate-left")) {
-                    this.rotateLeft(evt.currentTarget.offsetParent);
+                    this.rotateLeft(dojo.query("#" + this.divIdToRotate)[0]);
                 }
                 else {
-                    this.rotateRight(evt.currentTarget.offsetParent);
+                    this.rotateRight(dojo.query("#" + this.divIdToRotate)[0]);
                 }
                 this.computePossibleMoves();
             },
@@ -436,6 +457,7 @@ define([
                         this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation));
 
                     dojo.query('.possiblemove').forEach(dojo.destroy);
+                    dojo.query('.manipulation-arrow').forEach(dojo.destroy);
                 }
 
                 this.placeCard(notif.args.card_type,
