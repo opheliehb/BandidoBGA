@@ -202,7 +202,7 @@ define([
                 dojo.place(
                     // TODO change jstpl_cardontable because x is always 0
                     this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
-                    $('map_scrollable_oversurface'));
+                    $('map_scrollable'));
 
                 var divid = 'cardontable_' + card_id;
                 this.placeCardDiv(divid, position)
