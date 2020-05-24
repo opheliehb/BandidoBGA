@@ -69,8 +69,17 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must play a card or change their hand'),
         "descriptionmyturn" => clienttranslate('${you} must play a card or change your hand'),
         "type" => "activeplayer",
+        "action" => "stComputePossibleMoves",
         "possibleactions" => array("playCard", "changeHand", "getPossibleMoves"),
-        "transitions" => array("nextPlayer" => 2, "endGame" => 99)
+        "transitions" => array("nextPlayer" => 3)
+    ),
+    
+    3 => array(
+        "name" => "nextPlayer",
+        "type" => "game",
+        "action" => "stNextPlayer",
+        "updateGameProgression" => true,        
+        "transitions" => array( "nextTurn" => 2, "endGame" => 99 )
     ),
 
     // Final state.

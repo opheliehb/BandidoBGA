@@ -217,15 +217,15 @@ class Bandido extends Table
 
         return array($canBePlaced, $hasAtLeastOneNeighbor);
     }
-    
+
     function cardCanBePlaced($id, $x, $y, $rotation, $grid)
     {
         if ($grid[$x][$y]["subcard_id"] != null) {
             return false;
         }
 
-        $subcard_0 = new BNDSubcard($id."_0", $rotation);
-        $subcard_1 = new BNDSubcard($id."_1", $rotation);
+        $subcard_0 = new BNDSubcard($id . "_0", $rotation);
+        $subcard_1 = new BNDSubcard($id . "_1", $rotation);
 
         // var_dump("Testing card :");
         // var_dump($id);
@@ -278,20 +278,19 @@ class Bandido extends Table
 
     function getPlayableLocationFotOtherSubcard($x, $y, $rotation)
     {
-        switch($rotation)
-        {
+        switch ($rotation) {
             case 0:
                 return array($x - 1, $y);
-            break;
+                break;
             case 90:
                 return array($x, $y - 1);
-            break;
+                break;
             case 180:
                 return array($x + 1, $y);
-            break;
+                break;
             case 270:
                 return array($x, $y + 1);
-            break;
+                break;
         }
     }
 
@@ -330,7 +329,7 @@ class Bandido extends Table
         self::checkAction('playCard');
 
         $player_id = self::getActivePlayerId();
-        
+
         $grid = BNDGrid::GetFullGrid();
         $card = $this->cards->getCard($card_id);
         if (!self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
@@ -343,6 +342,14 @@ class Bandido extends Table
         // it's just to remove the card from the player's hand
         $this->cards->moveCard($card_id, 'grid');
 
+        // Delete the card from the player moves as it's been placed
+        $sqlDelete = sprintf(
+            "DELETE FROM playermoves WHERE player_id=%d AND card_id=%d AND rotation=%d",
+            $player_id,
+            $card['id'],
+            $rotation
+        );
+        self::DbQuery($sqlDelete);
 
         // Notify all players about the card played
         self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
@@ -359,11 +366,7 @@ class Bandido extends Table
         // Notify active player about the card he's redrawn
         self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
 
-        if (self::gameHasEnded()) {
-            $this->gamestate->nextState("endGame");
-        } else {
-            $this->gamestate->nextState("nextPlayer");
-        }
+        $this->gamestate->nextState("nextPlayer");
     }
 
     function getPossibleMoves($card_id, $rotation)
@@ -375,32 +378,22 @@ class Bandido extends Table
 
         $card = $this->cards->getCard($card_id);
 
-        $possibleMoves = array();
-        $playableLocations = BNDGrid::getPlayableLocations();
-        
-        $grid = BNDGrid::GetFullGrid();
-        // // var_dump("rotation");
-        // // var_dump($rotation);
-        foreach ($playableLocations as $location) {
-            // var_dump("Testing location :");
-            // var_dump($location);
-            if(self::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid))
-            {
-                // var_dump("Card can be placed");
-                array_push($possibleMoves, $location);
-            }
+        $sqlGetMoves = sprintf(
+            "SELECT locations FROM playermoves WHERE player_id=%d AND card_id=%d AND rotation=%d",
+            $player_id,
+            $card['id'],
+            $rotation
+        );
 
-            $other_location = self::getPlayableLocationFotOtherSubcard($location[0], $location[1], $rotation);
-            // var_dump("Testing other location :");
-            // var_dump($other_location);
-            if(self::cardCanBePlaced($card['type_arg'], $other_location[0], $other_location[1], $rotation, $grid))
-            {
-                // var_dump("Card can be placed");
-                array_push($possibleMoves, $other_location);
-            }
-        }
+        $locationsStr = self::getUniqueValueFromDB($sqlGetMoves);
+        $locations = unserialize($locationsStr);
 
-        self::notifyPlayer($player_id, "possibleMoves", "", array('possibleMoves' => array_unique($possibleMoves, 0)));
+        self::notifyPlayer(
+            $player_id,
+            "possibleMoves",
+            "",
+            array('possibleMoves' => array_unique($locations, 0))
+        );
     }
 
     function changeHand()
@@ -442,6 +435,72 @@ class Bandido extends Table
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
+
+    function stComputePossibleMoves()
+    {
+        $player_id = self::getActivePlayerId();
+        $cards = $this->cards->getCardsInLocation('hand', $player_id);
+        $playableLocations = BNDGrid::getPlayableLocations();
+
+        $grid = BNDGrid::GetFullGrid();
+        // // var_dump("rotation");
+        // // var_dump($rotation);
+        foreach ($cards as $card) {
+            foreach (array(0, 90, 180, 270) as $rotation) {
+                $tempPossibleMoves = array();
+                foreach ($playableLocations as $location) {
+                    // var_dump("Testing location :");
+                    // var_dump($location);
+                    if (self::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
+                        // var_dump("Card can be placed");
+                        array_push($tempPossibleMoves, $location);
+                    }
+
+                    $other_location = self::getPlayableLocationFotOtherSubcard($location[0], $location[1], $rotation);
+                    // var_dump("Testing other location :");
+                    // var_dump($other_location);
+                    if (self::cardCanBePlaced(
+                        $card['type_arg'],
+                        $other_location[0],
+                        $other_location[1],
+                        $rotation,
+                        $grid
+                    )) {
+                        // var_dump("Card can be placed");
+                        array_push($tempPossibleMoves, $other_location);
+                    }
+                }
+
+                $locations = serialize($tempPossibleMoves);
+                $sqlInsert = sprintf(
+                    "INSERT INTO playermoves VALUES ( '%d', '%d', '%d', '%s' )
+                    ON DUPLICATE KEY UPDATE locations='%s'",
+                    $player_id,
+                    $card['id'],
+                    $rotation,
+                    $locations,
+                    $locations
+                );
+                self::DbQuery($sqlInsert);
+            }
+        }
+    }
+
+    function stNextPlayer()
+    {
+        // Active next player
+        $player_id = self::activeNextPlayer();
+
+        if (self::gameHasEnded()) {
+            $this->gamestate->nextState("endGame");
+        } else {
+            // todo test that they can play
+            // This player can play. Give him some extra time
+            self::giveExtraTime($player_id);
+            $this->gamestate->nextState('nextTurn');
+        }
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie
