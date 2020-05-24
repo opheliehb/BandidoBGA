@@ -173,11 +173,10 @@ class Bandido extends Table
         return $canBePlaced;
     }
 
-    function testExits($currentSubcard, $x, $y)
+    function testExits($currentSubcard, $x, $y, $grid)
     {
         $canBePlaced = true;
         $hasAtLeastOneNeighbor = false;
-        $grid = BNDGrid::GetFullGrid();
 
         $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
         if ($leftNeighborSubcard != null) {
@@ -214,9 +213,8 @@ class Bandido extends Table
         return array($canBePlaced, $hasAtLeastOneNeighbor);
     }
     
-    function cardCanBePlaced($id, $x, $y, $rotation)
+    function cardCanBePlaced($id, $x, $y, $rotation, $grid)
     {
-        $grid = BNDGrid::GetFullGrid();
         if ($grid[$x][$y]["subcard_id"] != null) {
             return false;
         }
@@ -237,29 +235,29 @@ class Bandido extends Table
                     return false;
                 }
                 // Check if the subcards exits match their neighbor's and if they have at least 1 neighbor
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y, $grid);
                 break;
             case 90:
                 if ($grid[$x][$y + 1]["subcard_id"] != null) {
                     return false;
                 }
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y + 1);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y + 1, $grid);
                 break;
             case 180:
                 if ($grid[$x - 1][$y]["subcard_id"] != null) {
                     return false;
                 }
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x - 1, $y);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x - 1, $y, $grid);
                 break;
             case 270:
                 if ($grid[$x][$y - 1]["subcard_id"] != null) {
                     return false;
                 }
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y - 1);
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y - 1, $grid);
                 break;
         }
 
@@ -327,9 +325,10 @@ class Bandido extends Table
         self::checkAction('playCard');
 
         $player_id = self::getActivePlayerId();
-
+        
+        $grid = BNDGrid::GetFullGrid();
         $card = $this->cards->getCard($card_id);
-        if (!self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation)) {
+        if (!self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
             throw new feException("Invalid card placement!");
         }
 
@@ -374,12 +373,13 @@ class Bandido extends Table
         $possibleMoves = array();
         $playableLocations = BNDGrid::getPlayableLocations();
         
+        $grid = BNDGrid::GetFullGrid();
         // // var_dump("rotation");
         // // var_dump($rotation);
         foreach ($playableLocations as $location) {
             // var_dump("Testing location :");
             // var_dump($location);
-            if(self::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation))
+            if(self::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid))
             {
                 // var_dump("Card can be placed");
                 array_push($possibleMoves, $location);
@@ -388,7 +388,7 @@ class Bandido extends Table
             $other_location = self::getPlayableLocationFotOtherSubcard($location[0], $location[1], $rotation);
             // var_dump("Testing other location :");
             // var_dump($other_location);
-            if($canBePlaced = self::cardCanBePlaced($card['type_arg'], $other_location[0], $other_location[1], $rotation))
+            if($canBePlaced = self::cardCanBePlaced($card['type_arg'], $other_location[0], $other_location[1], $rotation, $grid))
             {
                 // var_dump("Card can be placed");
                 array_push($possibleMoves, $other_location);
