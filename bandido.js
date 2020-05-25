@@ -16,7 +16,7 @@
  */
 
 define([
-    "dojo", 
+    "dojo",
     "dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter",
@@ -264,44 +264,30 @@ define([
                 }, this, function (result) { });
             },
 
-            rotateLeft: function (cardElement) {
+            rotate: function (cardElement, rotateClockwise) {
                 if (this.card == null) {
                     return;
                 }
-                switch(this.cardRotations[this.card.id]) {
-                    case 180:
-                        dojo.style(cardElement, 'top', '50px');
-                        this.cardRotations[this.card.id] -= 90;
-                        break;
-                    case 0:
-                        dojo.style(cardElement, 'top', '50px');
-                        this.cardRotations[this.card.id] = 270;
-                        break;
-                    default:
-                        dojo.style(cardElement, 'top', '0px');
-                        this.cardRotations[this.card.id] -= 90;
-                }
-                dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
-            },
 
-            rotateRight: function (cardElement) {
-                if (this.card == null) {
-                    return;
+                var rotation = rotateClockwise ? 90 : -90;
+
+                // Add rotation and keep the value under 360 with modulo
+                this.cardRotations[this.card.id] = (this.cardRotations[this.card.id] + rotation) % 360;
+
+                // Only time the rotation can be negative is when it was 0 and was rotated anti-clockwise (-90 degree)
+                // So set it back to 270 degree
+                if (this.cardRotations[this.card.id] < 0) {
+                    this.cardRotations[this.card.id] = 270;
                 }
-                switch (this.cardRotations[this.card.id]) {
-                    case 0:
-                    case 180:
-                        dojo.style(cardElement, 'top', '50px');
-                        this.cardRotations[this.card.id] += 90;
-                        break;
-                    case 270:
-                        dojo.style(cardElement, 'top', '0px');
-                        this.cardRotations[this.card.id] = 0;
-                        break;
-                    default:
-                        dojo.style(cardElement, 'top', '0px');
-                        this.cardRotations[this.card.id] += 90;
+
+                // When the rotation makes the card vertical, set its top to 50px, oherwise, set it to 0px.
+                if (this.cardRotations[this.card.id] == 90 || this.cardRotations[this.card.id] == 270) {
+                    dojo.style(cardElement, 'top', '50px');
+                } else {
+                    dojo.style(cardElement, 'top', '0px');
                 }
+
+                // Apply the rotation
                 dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
             },
 
@@ -354,12 +340,12 @@ define([
                 // Place arrows on card
                 var divId = this.playerHand.getItemDivId(item_id);
                 var cardDiv = dojo.query("#" + divId);
-                var leftPos = parseInt(cardDiv[0].style.left, 10) + this.cardwidth/2;
+                var leftPos = parseInt(cardDiv[0].style.left, 10) + this.cardwidth / 2;
 
                 this.divIdToRotate = divId;
                 // 24 is the rotate image size
-                dojo.place(this.format_block('jstpl_rotateleft', {left: leftPos - 24}), $("playerhand"));
-                dojo.place(this.format_block('jstpl_rotateright', {left: leftPos}), $("playerhand"));
+                dojo.place(this.format_block('jstpl_rotateleft', { left: leftPos - 24 }), $("playerhand"));
+                dojo.place(this.format_block('jstpl_rotateright', { left: leftPos }), $("playerhand"));
                 dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
 
                 this.computePossibleMoves();
@@ -369,10 +355,10 @@ define([
             onClickRotateCard: function (evt) {
                 dojo.stopEvent(evt);
                 if (dojo.hasClass(evt.currentTarget, "rotate-left")) {
-                    this.rotateLeft(dojo.query("#" + this.divIdToRotate)[0]);
+                    this.rotate(dojo.query("#" + this.divIdToRotate)[0], true);
                 }
                 else {
-                    this.rotateRight(dojo.query("#" + this.divIdToRotate)[0]);
+                    this.rotate(dojo.query("#" + this.divIdToRotate)[0], false);
                 }
                 this.computePossibleMoves();
             },
