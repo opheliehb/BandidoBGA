@@ -270,6 +270,7 @@ define([
                 }
 
                 var rotation = rotateClockwise ? 90 : -90;
+                var previousRotation = this.cardRotations[this.card.id];
 
                 // Add rotation and keep the value under 360 with modulo
                 this.cardRotations[this.card.id] = (this.cardRotations[this.card.id] + rotation) % 360;
@@ -286,6 +287,13 @@ define([
                 } else {
                     dojo.style(cardElement, 'top', '0px');
                 }
+
+                var animation = new dojo.Animation({
+                    curve: [0, rotation],
+                    onAnimate: function (v) {
+                        cardElement.style['transform'] = 'rotate(' + (previousRotation + v) + 'deg)';
+                    }
+                }).play();
 
                 // Apply the rotation
                 dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
