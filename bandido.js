@@ -281,13 +281,6 @@ define([
                     this.cardRotations[this.card.id] = 270;
                 }
 
-                // When the rotation makes the card vertical, set its top to 50px, oherwise, set it to 0px.
-                if (this.cardRotations[this.card.id] == 90 || this.cardRotations[this.card.id] == 270) {
-                    dojo.style(cardElement, 'top', '50px');
-                } else {
-                    dojo.style(cardElement, 'top', '0px');
-                }
-
                 var animation = new dojo.Animation({
                     curve: [0, rotation],
                     onAnimate: function (v) {
@@ -295,8 +288,7 @@ define([
                     }
                 }).play();
 
-                // Apply the rotation
-                dojo.style(cardElement, 'transform', 'rotate(' + this.cardRotations[this.card.id] + 'deg)');
+
             },
 
             ///////////////////////////////////////////////////
