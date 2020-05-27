@@ -92,7 +92,7 @@ define([
                     $('map_surface'),
                     $('map_scrollable_oversurface'));
                 this.scrollmap.setupOnScreenArrows(150);
-                
+
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
                 dojo.connect($('moveleft'), 'onclick', this, 'onMoveLeft');
                 dojo.connect($('moveright'), 'onclick', this, 'onMoveRight');
@@ -115,6 +115,7 @@ define([
 
                 switch (stateName) {
                     case 'playerTurn':
+                        this.possibleMoves = args.args.possibleMoves;
                         break;
                 }
             },
@@ -259,10 +260,10 @@ define([
              * Clears the possible moves displayed then recomputes them.
              * Takes into account card and rotation.
              */
-            computePossibleMoves: function (evt) {
+            updatePossibleMoves: function () {
                 dojo.query('.possiblemove').forEach(dojo.destroy);
 
-                var cardRotation = this.cardRotations[this.card.id];                
+                var cardRotation = this.cardRotations[this.card.id];
 
                 for (var idx in this.possibleMoves[this.card.id][cardRotation]) {
                     var possibleMove = this.possibleMoves[this.card.id][cardRotation][idx];
@@ -367,7 +368,7 @@ define([
                 dojo.place(this.format_block('jstpl_rotateright', { left: leftPos }), $("playerhand"));
                 dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
 
-                this.computePossibleMoves();
+                this.updatePossibleMoves();
             },
 
             // Rotates card according to the arrow clicked
@@ -379,7 +380,7 @@ define([
                 else {
                     this.rotate(dojo.query("#" + this.divIdToRotate)[0], false);
                 }
-                this.computePossibleMoves();
+                this.updatePossibleMoves();
             },
 
             onClickPossibleMove: function (evt) {
