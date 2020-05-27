@@ -83,6 +83,8 @@ define([
 
                 this.placeCardsOnGrid(this.gamedatas.grid);
 
+                this.possibleMoves = this.gamedatas.possibleMoves;
+
                 /** Begin scrollmap setup */
                 this.scrollmap.create(
                     $('map_container'),
@@ -90,6 +92,7 @@ define([
                     $('map_surface'),
                     $('map_scrollable_oversurface'));
                 this.scrollmap.setupOnScreenArrows(150);
+                
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
                 dojo.connect($('moveleft'), 'onclick', this, 'onMoveLeft');
                 dojo.connect($('moveright'), 'onclick', this, 'onMoveRight');
@@ -258,10 +261,26 @@ define([
              */
             computePossibleMoves: function (evt) {
                 dojo.query('.possiblemove').forEach(dojo.destroy);
-                this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
-                    rotation: this.cardRotations[this.card.id],
-                    cardId: this.card.id,
-                }, this, function (result) { });
+
+                var cardRotation = this.cardRotations[this.card.id];                
+
+                for (var idx in this.possibleMoves[this.card.id][cardRotation]) {
+                    var possibleMove = this.possibleMoves[this.card.id][cardRotation][idx];
+
+                    var x = possibleMove[0];
+                    var y = possibleMove[1];
+
+                    dojo.place(
+                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]) +
+                        " class=possiblemove style=\"background-position:0px -" +
+                        this.card.type * this.cardheight + "px\"></div>",
+                        $('map_scrollable_oversurface')
+                    );
+                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]),
+                        { x: x, y: y, rotation: this.cardRotations[this.card.id] });
+                }
+
+                dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
             },
 
             rotate: function (cardElement, rotateClockwise) {
@@ -408,34 +427,12 @@ define([
             */
             setupNotifications: function () {
                 console.log('notifications subscriptions setup');
-                dojo.subscribe('possibleMoves', this, "notif_possibleMoves");
                 dojo.subscribe('cardPlayed', this, "notif_cardPlayed");
                 dojo.subscribe('cardDrawn', this, "notif_addCardToHand");
                 dojo.subscribe('changeHand', this, "notif_changeHand");
             },
 
-            notif_possibleMoves: function (notif) {
-                console.log('notif_cardPlayed');
-                console.log(notif);
 
-                for (var idx in notif.args.possibleMoves) {
-                    var possibleMove = notif.args.possibleMoves[idx];
-
-                    var x = possibleMove[0];
-                    var y = possibleMove[1];
-
-                    dojo.place(
-                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]) +
-                        " class=possiblemove style=\"background-position:0px -" +
-                        this.card.type * this.cardheight + "px\"></div>",
-                        $('map_scrollable_oversurface')
-                    );
-                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]),
-                        { x: x, y: y, rotation: this.cardRotations[this.card.id] });
-                }
-
-                dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
-            },
 
             notif_cardPlayed: function (notif) {
                 console.log('notif_cardPlayed');
