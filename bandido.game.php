@@ -130,6 +130,27 @@ class Bandido extends Table
 
         $result['grid'] = BNDGrid::GetGrid();
 
+
+        $active_player_id = self::getActivePlayerId();
+        if ($current_player_id == $active_player_id) {
+            $sqlGetPossibleMoves = sprintf(
+                "SELECT card_id, rotation, locations FROM playermoves WHERE player_id=%d",
+                $current_player_id
+            );
+            
+            $serializedLocations = self::getDoubleKeyCollectionFromDB($sqlGetPossibleMoves);
+            $locations = array();
+            foreach($serializedLocations as $card_id => $card_rotations)
+            {
+                foreach($card_rotations as $rotation => $location)
+                {
+                    $locations[$card_id][$rotation] = unserialize($location["locations"]);
+                }   
+            }
+
+            $result['possibleMoves'] = $locations;
+        }
+
         return $result;
     }
 
