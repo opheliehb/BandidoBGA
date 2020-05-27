@@ -82,5 +82,11 @@ class BNDExitMap {
         list($card_id, $subcard_id) = explode('_', $dbsubcard_id);
         return self::$_exits[$card_id][$subcard_id];
     }
+    
+    public static function set($dbsubcard_id, $exits)
+    {
+        list($card_id, $subcard_id) = explode('_', $dbsubcard_id);
+        self::$_exits[$card_id][$subcard_id] = $exits;
+    }
 
 }

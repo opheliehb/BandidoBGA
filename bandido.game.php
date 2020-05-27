@@ -335,7 +335,7 @@ class Bandido extends Table
 
     function gameHasEnded()
     {
-        var_dump('playable locations');
+        var_dump("BNDGrid::getPlayableLocations()");
         var_dump(BNDGrid::getPlayableLocations());
         if (count(BNDGrid::getPlayableLocations()) == 0) {
             $this->playersWin = true;
@@ -545,6 +545,7 @@ class Bandido extends Table
         // Active next player
         $player_id = self::activeNextPlayer();
 
+        var_dump("call gameHasEnded");
         if (self::gameHasEnded()) {
             var_dump("game is finished");
             $this->gamestate->nextState("endGame");
