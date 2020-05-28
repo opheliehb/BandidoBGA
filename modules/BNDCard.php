@@ -28,7 +28,9 @@ class BNDSubcard
         $this->_card_id = $subcard_id;
         $this->_rotation = $rotation;
         $origExits = BNDExitMap::get($this->_card_id);
-        $exits = self::getRotation($origExits);
+        $exits = $this->getRotation($origExits);
+        // var_dump($subcard_id);
+        // var_dump($exits);
         $this->_left = $exits[0];
         $this->_right = $exits[1];
         $this->_top = $exits[2];
@@ -46,25 +48,25 @@ class BNDSubcard
     function setLeftExit($exit_id)
     {
         $this->_left = $exit_id;
-        BNDExitMap::set($this->_card_id, self::undoRotation());
+        BNDExitMap::set($this->_card_id, $this->undoRotation());
     }
 
     function setRightExit($exit_id)
     {
         $this->_right = $exit_id;
-        BNDExitMap::set($this->_card_id, self::undoRotation());
+        BNDExitMap::set($this->_card_id, $this->undoRotation());
     }
 
     function setTopExit($exit_id)
     {
         $this->_top = $exit_id;
-        BNDExitMap::set($this->_card_id, self::undoRotation());
+        BNDExitMap::set($this->_card_id, $this->undoRotation());
     }
 
     function setBottomExit($exit_id)
     {
         $this->_bottom = $exit_id;
-        BNDExitMap::set($this->_card_id, self::undoRotation());
+        BNDExitMap::set($this->_card_id, $this->undoRotation());
     }
 
     function getRotation($subcard) {
@@ -90,13 +92,13 @@ class BNDSubcard
                 return array($this->_left, $this->_right, $this->_top, $this->_bottom);
             break;
             case 90:
-                return array($this->_bottom, $this->_top, $this->_left, $this->_right);
+                return array($this->_top, $this->_bottom, $this->_right, $this->_left);
             break;
             case 180:
                 return array($this->_right, $this->_left, $this->_bottom, $this->_top);
             break;
             case 270:
-                return array($this->_top, $this->_bottom, $this->_right, $this->_left);
+                return array($this->_bottom, $this->_top, $this->_left, $this->_right);
             break;
         }
     }

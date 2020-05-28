@@ -185,6 +185,7 @@ define([
                         case 'playerTurn':
                             this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
                             this.addActionButton('debug change hand', _('debugchangehand'), 'onDebugChangeHand');
+                            this.addActionButton('debug compute possible moves', _('debugcomputepossiblemoves'), 'onDebugComputePossibleMoves');
                             break;
                     }
                 }
@@ -344,6 +345,15 @@ define([
                 dojo.stopEvent(evt);
 
                 this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
+            },
+
+            onDebugComputePossibleMoves: function (evt) {
+                dojo.stopEvent(evt);
+                
+                this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
+                    rotation: this.cardRotations[this.card.id],
+                    cardId: this.card.id,
+                }, this, function (result) { });
             },
 
             onSelectCard: function (control_name, item_id) {

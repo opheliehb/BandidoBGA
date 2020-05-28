@@ -64,6 +64,8 @@ class BNDGrid extends APP_DbObject
     public static function placeSubcard($id, $x, $y, $rotation, $grid)
     {
         $subcard = NEW BNDSubcard($id, $rotation);
+        // var_dump("Before     Exit Update");
+        // var_dump($subcard);
         if($subcard->_left == -1)
         {
             $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
@@ -96,6 +98,8 @@ class BNDGrid extends APP_DbObject
                 $bottomNeighborSubcard->setTopExit($subcard->_card_id);
             }
         }
+        // var_dump("After Exit Update");
+        // var_dump($subcard);
         $sqlInsert = sprintf("UPDATE grid SET subcard_id='%s', rotation=%d WHERE x=%d AND y=%d",  $id, $rotation, $x, $y);
         self::DbQuery($sqlInsert);
     }

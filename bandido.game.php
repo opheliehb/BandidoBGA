@@ -193,10 +193,10 @@ class Bandido extends Table
 
         $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
         if ($leftNeighborSubcard != null) {
-            var_dump("CURRENT");
-            var_dump($currentSubcard->_left);
-            var_dump("LEFT NEIG");
-            var_dump($leftNeighborSubcard->_right);
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_left);
+            // var_dump("LEFT NEIG");
+            // var_dump($leftNeighborSubcard->_right);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_left, $leftNeighborSubcard->_right);
@@ -205,10 +205,10 @@ class Bandido extends Table
         $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
         // var_dump($rightNeighborSubcard);
         if ($rightNeighborSubcard != null) {
-            var_dump("CURRENT");
-            var_dump($currentSubcard->_right);
-            var_dump("RIGHT NEIG");
-            var_dump($rightNeighborSubcard->_left);
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_right);
+            // var_dump("RIGHT NEIG");
+            // var_dump($rightNeighborSubcard->_left);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_right, $rightNeighborSubcard->_left);
@@ -217,20 +217,20 @@ class Bandido extends Table
         $topNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
         if ($topNeighborSubcard != null) {
             $hasAtLeastOneNeighbor = true;
-            var_dump("CURRENT");
-            var_dump($currentSubcard->_top);
-            var_dump("TOP NEIG");
-            var_dump($topNeighborSubcard->_bottom);
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_top);
+            // var_dump("TOP NEIG");
+            // var_dump($topNeighborSubcard->_bottom);
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_top, $topNeighborSubcard->_bottom);
         }
 
         $bottomNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
         if ($bottomNeighborSubcard != null) {
-            var_dump("CURRENT");
-            var_dump($currentSubcard->_right);
-            var_dump("BOTTOM NEIG");
-            var_dump($bottomNeighborSubcard->_top);
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_right);
+            // var_dump("BOTTOM NEIG");
+            // var_dump($bottomNeighborSubcard->_top);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_bottom, $bottomNeighborSubcard->_top);
@@ -386,6 +386,12 @@ class Bandido extends Table
         }
 
         return $locations;
+    }
+
+    function debugGetPossibleMoves($card_id, $rotation)
+    {
+        $cards = $this->cards->getCards(array($card_id));
+        $this->computePossibleMoves($this->getActivePlayerId(), $cards);
     }
 
     function computePossibleMoves($player_id, $cards = null)
