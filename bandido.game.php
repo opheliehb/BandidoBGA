@@ -90,19 +90,21 @@ class Bandido extends Table
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
+        BNDExitMap::Initialize();
+        
         for ($value = 0; $value < 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
         }
 
         $this->cards->createCards($cards, 'deck');
-        self::dealStartingCards();
+        $this->dealStartingCards();
 
         BNDGrid::InitializeGrid(self::getGameStateValue('supercardId'));
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
-        self::computePossibleMoves(self::getActivePlayerId());
+        $this->computePossibleMoves($this->getActivePlayerId());
 
         /************ End of the game initialization *****/
     }
@@ -136,9 +138,9 @@ class Bandido extends Table
         $result['grid'] = BNDGrid::GetGrid();
 
 
-        $active_player_id = self::getActivePlayerId();
+        $active_player_id = $this->getActivePlayerId();
         if ($current_player_id == $active_player_id) {
-            $result['possibleMoves'] = self::getPossibleMoves($current_player_id);
+            $result['possibleMoves'] = $this->getPossibleMoves($current_player_id);
         }
 
         return $result;
@@ -191,6 +193,10 @@ class Bandido extends Table
 
         $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
         if ($leftNeighborSubcard != null) {
+            var_dump("CURRENT");
+            var_dump($currentSubcard->_left);
+            var_dump("LEFT NEIG");
+            var_dump($leftNeighborSubcard->_right);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_left, $leftNeighborSubcard->_right);
@@ -199,10 +205,10 @@ class Bandido extends Table
         $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
         // var_dump($rightNeighborSubcard);
         if ($rightNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_right);
-            // var_dump("RIGHT NEIG");
-            // var_dump($rightNeighborSubcard->_left);
+            var_dump("CURRENT");
+            var_dump($currentSubcard->_right);
+            var_dump("RIGHT NEIG");
+            var_dump($rightNeighborSubcard->_left);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_right, $rightNeighborSubcard->_left);
@@ -211,16 +217,20 @@ class Bandido extends Table
         $topNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
         if ($topNeighborSubcard != null) {
             $hasAtLeastOneNeighbor = true;
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_top);
-            // var_dump("TOP NEIG");
-            // var_dump($topNeighborSubcard->_bottom);
+            var_dump("CURRENT");
+            var_dump($currentSubcard->_top);
+            var_dump("TOP NEIG");
+            var_dump($topNeighborSubcard->_bottom);
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_top, $topNeighborSubcard->_bottom);
         }
 
         $bottomNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
         if ($bottomNeighborSubcard != null) {
+            var_dump("CURRENT");
+            var_dump($currentSubcard->_right);
+            var_dump("BOTTOM NEIG");
+            var_dump($bottomNeighborSubcard->_top);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_bottom, $bottomNeighborSubcard->_top);
@@ -308,8 +318,8 @@ class Bandido extends Table
     function gameWins()
     {
         /** Check if the active player can play */
-        $active_player_id = self::getActivePlayerId();
-        self::computePossibleMoves($active_player_id);
+        $active_player_id = $this->getActivePlayerId();
+        $this->computePossibleMoves($active_player_id);
         $sqlGetMoves = sprintf(
             "SELECT locations FROM playermoves WHERE player_id=%d",
             $active_player_id
@@ -323,20 +333,20 @@ class Bandido extends Table
 
         foreach ($otherplayers as $player_id) {
             $cards = $this->cards->getCardsInLocation('hand', $player_id);
-            if (self::computePossibleMoves(null, $cards)) {
+            if ($this->computePossibleMoves(null, $cards)) {
                 return false;
             }
         }
 
         /** If no one can play, check if there is at least one card left in the deck that can be played */
         $deckCards = self::getCardsInLocation('deck');
-        return !(self::computePossibleMoves(null, $deckCards));
+        return !($this->computePossibleMoves(null, $deckCards));
     }
 
     function gameHasEnded()
     {
-        var_dump("BNDGrid::getPlayableLocations()");
-        var_dump(BNDGrid::getPlayableLocations());
+        // var_dump("BNDGrid::getPlayableLocations()");
+        // var_dump(BNDGrid::getPlayableLocations());
         if (count(BNDGrid::getPlayableLocations()) == 0) {
             $this->playersWin = true;
         }
@@ -450,7 +460,7 @@ class Bandido extends Table
         // Check that action is possible for player
         self::checkAction('playCard');
 
-        $player_id = self::getActivePlayerId();
+        $player_id = $this->getActivePlayerId();
 
         $grid = BNDGrid::GetFullGrid();
         $card = $this->cards->getCard($card_id);
@@ -498,7 +508,7 @@ class Bandido extends Table
         // Check that action is possible for player
         self::checkAction('changeHand');
 
-        $player_id = self::getActivePlayerId();
+        $player_id = $this->getActivePlayerId();
 
         // Move all cards from the player's hand to the bottom of the deck
         $playerHand = $this->cards->getPlayerHand($player_id);
@@ -527,7 +537,7 @@ class Bandido extends Table
     function argPossibleMoves()
     {
         return array(
-            'possibleMoves' => self::getPossibleMoves(self::getActivePlayerId())
+            'possibleMoves' => $this->getPossibleMoves($this->getActivePlayerId())
         );
     }
 
@@ -543,16 +553,16 @@ class Bandido extends Table
     function stNextPlayer()
     {
         // Active next player
-        $player_id = self::activeNextPlayer();
+        $player_id = $this->activeNextPlayer();
 
-        var_dump("call gameHasEnded");
-        if (self::gameHasEnded()) {
-            var_dump("game is finished");
+        // var_dump("call gameHasEnded");
+        if ($this->gameHasEnded()) {
+            // var_dump("game is finished");
             $this->gamestate->nextState("endGame");
         } else {
             // todo test that they can play
             // This player can play. Give him some extra time
-            self::giveExtraTime($player_id);
+            $this->giveExtraTime($player_id);
             $this->gamestate->nextState('nextTurn');
         }
     }

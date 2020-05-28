@@ -51,13 +51,21 @@ CREATE TABLE IF NOT EXISTS `grid` (
   PRIMARY KEY (`x`,`y`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE IF NOT EXISTS `playermoves` (
   `player_id` int(8) NOT NULL,
   `card_id` int(8) NOT NULL,
   `rotation` int(8),
   `locations` varchar(300) NOT NULL,
   PRIMARY KEY (`card_id`,`rotation`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `exits` (
+  `subcard_id` varchar(4),
+  `_left` varchar(4) DEFAULT NULL,
+  `_right` varchar(4) DEFAULT NULL,
+  `_top` varchar(4) DEFAULT NULL,
+  `_bottom` varchar(4) DEFAULT NULL,
+  PRIMARY KEY (`subcard_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

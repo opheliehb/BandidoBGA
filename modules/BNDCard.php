@@ -70,16 +70,16 @@ class BNDSubcard
     function getRotation($subcard) {
         switch ($this->_rotation) {
             case 0:
-                return $subcard;
+                return array($subcard["_left"], $subcard["_right"], $subcard["_top"], $subcard["_bottom"]);
             break;
             case 90:
-                return array($subcard[3], $subcard[2], $subcard[0], $subcard[1]);
+                return array($subcard["_bottom"], $subcard["_top"], $subcard["_left"], $subcard["_right"]);
             break;
             case 180:
-                return array($subcard[1], $subcard[0], $subcard[3], $subcard[2]);
+                return array($subcard["_right"], $subcard["_left"], $subcard["_bottom"], $subcard["_top"]);
             break;
             case 270:
-                return array($subcard[2], $subcard[3], $subcard[1], $subcard[0]);
+                return array($subcard["_top"], $subcard["_bottom"], $subcard["_right"], $subcard["_left"]);
             break;
         }
     }
