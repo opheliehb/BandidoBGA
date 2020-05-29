@@ -349,6 +349,7 @@ class Bandido extends Table
         // var_dump(BNDGrid::getPlayableLocations());
         if (count(BNDGrid::getPlayableLocations()) == 0) {
             $this->playersWin = true;
+            self::DbQuery( "UPDATE player SET player_score=1");
         }
         if (self::gameWins()) {
             $this->gameWins = true;
@@ -573,6 +574,10 @@ class Bandido extends Table
         }
     }
 
+    function stGameEnd()
+    {
+
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie
