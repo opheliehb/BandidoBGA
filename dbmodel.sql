@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `playermoves` (
   `player_id` int(8) NOT NULL,
   `card_id` int(8) NOT NULL,
   `rotation` int(8),
-  `locations` varchar(300) NOT NULL,
+  `locations` varchar(500) NOT NULL,
   PRIMARY KEY (`card_id`,`rotation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

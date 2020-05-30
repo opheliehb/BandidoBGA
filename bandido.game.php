@@ -265,6 +265,8 @@ class Bandido extends Table
                 list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y, $grid);
                 break;
             case 90:
+                // var_dump("grid[x][y + 1]");
+                // var_dump($grid[$x][$y + 1]);
                 if ($grid[$x][$y + 1]["subcard_id"] != null) {
                     return false;
                 }
@@ -403,14 +405,16 @@ class Bandido extends Table
         $playableLocations = BNDGrid::getPlayableLocations();
 
         $grid = BNDGrid::GetFullGrid();
-        // // var_dump("rotation");
-        // // var_dump($rotation);
+        // var_dump("grid[-1][1]");
+        // var_dump($grid[-1][1]);
         foreach ($cards as $card) {
             foreach (array(0, 90, 180, 270) as $rotation) {
                 $tempPossibleMoves = array();
                 foreach ($playableLocations as $location) {
                     // var_dump("Testing location :");
                     // var_dump($location);
+                    // var_dump("rotation");
+                    // var_dump($rotation);
                     if (self::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
                         // var_dump("Card can be placed");
                         array_push($tempPossibleMoves, $location);
@@ -426,7 +430,6 @@ class Bandido extends Table
                         $rotation,
                         $grid
                     )) {
-                        // var_dump("Card can be placed");
                         array_push($tempPossibleMoves, $other_location);
                     }
                 }
@@ -446,6 +449,8 @@ class Bandido extends Table
                         $locations,
                         $locations
                     );
+                    // var_dump("Card can be placed");
+                    // var_dump($sqlInsert);
                     self::DbQuery($sqlInsert);
                 }
             }
@@ -483,14 +488,8 @@ class Bandido extends Table
         // it's just to remove the card from the player's hand
         $this->cards->moveCard($card_id, 'grid');
 
-        // Delete the card from the player moves as it's been placed
-        $sqlDelete = sprintf(
-            "DELETE FROM playermoves WHERE player_id=%d AND card_id=%d AND rotation=%d",
-            $player_id,
-            $card['id'],
-            $rotation
-        );
-        self::DbQuery($sqlDelete);
+        // New card as been placed, delete all previous player move as they can change
+        self::DbQuery("DELETE FROM playermoves");
 
         // Notify all players about the card played
         self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
