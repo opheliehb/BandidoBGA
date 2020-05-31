@@ -24,8 +24,7 @@ class BNDGrid extends APP_DbObject
 
     public static function InitializeGrid($supercardId)
     {
-        // TODO add supercard at start
-        // Create an empty 69*69 grid in database
+        // Create an empty 138*138 grid in database
         for ($x = -69; $x <= 69; $x++) {
             for ($y = -69; $y <= 69; $y++) {
                 $sqlInsert = sprintf("INSERT INTO grid (x, y) VALUES ( '%d', '%d' )", $x, $y);
@@ -34,8 +33,7 @@ class BNDGrid extends APP_DbObject
         }
 
         $grid = BNDGrid::GetFullGrid();
-        self::placeSubcard("70_0", 0, 0, 0, $grid);
-        self::placeSubcard("70_1", 1, 0, 0, $grid);
+        self::placeCard($supercardId, 0, 0, 0);
     }
 
     public static function placeCard($id, $x, $y, $rotation)
