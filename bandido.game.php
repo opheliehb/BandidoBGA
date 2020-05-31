@@ -158,9 +158,10 @@ class Bandido extends Table
     */
     function getGameProgression()
     {
-        // TODO: compute and return the game progression
-
-        return 0;
+        $cardsInLocations = $this->cards->countCardsInLocations();
+        $cardCount = self::getUniqueValueFromDB("SELECT count(*) FROM card");
+        $cardsToPlace = $cardsInLocations['deck'] + $cardsInLocations['hand'];
+        return 100 * ($cardCount - $cardsToPlace) / $cardCount;
     }
 
 
