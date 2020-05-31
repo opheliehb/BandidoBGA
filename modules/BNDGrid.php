@@ -43,65 +43,82 @@ class BNDGrid extends APP_DbObject
         $grid = self::GetFullGrid();
         switch ($rotation) {
             case 0:
-                self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                self::placeSubcard($id . "_1", $x + 1, $y, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x + 1, $y, $rotation, $grid);
                 break;
             case 90:
-                self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                self::placeSubcard($id . "_1", $x, $y + 1, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x, $y + 1, $rotation, $grid);
                 break;
             case 180:
-                self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                self::placeSubcard($id . "_1", $x - 1, $y, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x - 1, $y, $rotation, $grid);
                 break;
             case 270:
-                self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                self::placeSubcard($id . "_1", $x, $y - 1, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x, $y - 1, $rotation, $grid);
                 break;
         }
+        return array($exits_opened_0 + $exits_opened_1, $exits_closed_0 + $exits_closed_1);
     }
 
     public static function placeSubcard($id, $x, $y, $rotation, $grid)
     {
-        $subcard = NEW BNDSubcard($id, $rotation);
+        $exits_closed = 0;
+        $exits_opened = 0;
+        $subcard = new BNDSubcard($id, $rotation);
         // var_dump("Before     Exit Update");
         // var_dump($subcard);
-        if($subcard->_left == -1)
-        {
+        if ($subcard->_left == -1) {
             $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
             if ($leftNeighborSubcard != null) {
+                $exits_closed++;
                 $subcard->setLeftExit($leftNeighborSubcard->_card_id);
                 $leftNeighborSubcard->setRightExit($subcard->_card_id);
             }
+            else {
+                $exits_opened++;
+            }
         }
-        if($subcard->_right == -1)
-        {
+        if ($subcard->_right == -1) {
             $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
             if ($rightNeighborSubcard != null) {
+                $exits_closed++;
                 $subcard->setRightExit($rightNeighborSubcard->_card_id);
                 $rightNeighborSubcard->setLeftExit($subcard->_card_id);
             }
+            else {
+                $exits_opened++;
+            }
         }
-        if($subcard->_top == -1)
-        {
+        if ($subcard->_top == -1) {
             $topNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
             if ($topNeighborSubcard != null) {
+                $exits_closed++;
                 $subcard->setTopExit($topNeighborSubcard->_card_id);
                 $topNeighborSubcard->setBottomExit($subcard->_card_id);
             }
+            else {
+                $exits_opened++;
+            }
         }
-        if($subcard->_bottom == -1)
-        {
+        if ($subcard->_bottom == -1) {
             $bottomNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
             if ($bottomNeighborSubcard != null) {
+                $exits_closed++;
                 $subcard->setBottomExit($bottomNeighborSubcard->_card_id);
                 $bottomNeighborSubcard->setTopExit($subcard->_card_id);
+            }
+            else {
+                $exits_opened++;
             }
         }
         // var_dump("After Exit Update");
         // var_dump($subcard);
         $sqlInsert = sprintf("UPDATE grid SET subcard_id='%s', rotation=%d WHERE x=%d AND y=%d",  $id, $rotation, $x, $y);
         self::DbQuery($sqlInsert);
+
+        return array($exits_opened, $exits_closed);
     }
 
     public static function getPlayableLocationsFromCard($subcard, $x, $y)

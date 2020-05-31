@@ -79,16 +79,7 @@ class Bandido extends Table
         self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         self::reloadPlayersBasicInfos();
 
-
-        /************ Start the game initialization *****/
-
-        // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-
-        // Init game statistics
-        // (note: statistics used in this file must be defined in your stats.inc.php file)
-        //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
-        //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+        $this->initGameStatistics();
 
         BNDExitMap::Initialize();
 
@@ -378,6 +369,58 @@ class Bandido extends Table
         }
     }
 
+    function initGameStatistics()
+    {
+        $this->initStat("table", "number_of_turns", 0);
+        $this->initStat("table", "cards_in_deck", 0);
+        $this->initStat("table", "longest_path", 0);
+        $this->initStat("table", "exits_opened", 0);
+        $this->initStat("table", "exits_closed", 0);
+        $this->initStat("table", "open_close_ratio", 0);
+
+        $this->initStat("player", "cards_played", 0);
+        $this->initStat("player", "exits_opened", 0);
+        $this->initStat("player", "exits_closed", 0);
+        $this->initStat("player", "exits_maintained", 0);
+        $this->initStat("player", "open_close_ratio", 0);
+    }
+
+    function computeFinalStatistics()
+    {
+        /** Compute opened and closed exits */
+        $player_list = self::loadPlayersBasicInfos();
+
+        $exits_opened = 0;
+        $exits_closed = 0;
+
+        foreach ($player_list as $player) {
+            $player_id = $player['player_id'];
+            $exits_opened_player = $this->getStat("exits_opened", $player_id);
+            $exits_closed_player = $this->getStat("exits_closed", $player_id);
+            if ($exits_closed_player != 0) {
+                $open_close_ratio = $exits_opened_player / $exits_closed_player;
+            } else {
+                $open_close_ratio = 0;
+            }
+            $this->setStat($open_close_ratio, "open_close_ratio", $player_id);
+
+            $exits_opened += $exits_opened_player;
+            $exits_closed += $exits_closed_player;
+        }
+
+        $this->setStat($exits_opened, "exits_opened");
+        $this->setStat($exits_closed, "exits_closed");
+        if ($exits_closed != 0) {
+            $this->setStat($exits_opened / $exits_closed, "open_close_ratio");
+        } else {
+            $this->setStat(0, "open_close_ratio");
+        }
+
+        /** Get cards left in deck */
+        $cards_in_deck = $this->cards->countCardInLocation('deck');
+        $this->setStat($cards_in_deck, "cards_in_deck");
+    }
+
     function getPossibleMoves($player_id)
     {
         $sqlGetPossibleMoves = sprintf(
@@ -492,7 +535,24 @@ class Bandido extends Table
             throw new feException("Invalid card placement!");
         }
 
-        BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
+        list($exits_opened, $exits_closed) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
+
+        /** Handle open/close exits stats
+         * exits opened = number of exits added by the player
+         * exits closed = number of exits connected to the card the player just played
+         * the diff between the 2 is the number of exits that have been added/removed from the game
+         */
+        if ($exits_opened > $exits_closed) {
+            var_dump('1');
+            $this->incStat($exits_opened - $exits_closed, "exits_opened", $player_id);
+        } else if ($exits_opened < $exits_closed) {
+            var_dump('2');
+            $this->incStat($exits_closed - $exits_opened, "exits_closed", $player_id);
+        } else {
+            var_dump('3');
+            $this->incStat(1, "exits_maintained", $player_id);
+        }
+        $this->incStat(1, "cards_played", $player_id);
 
         // Location grid is not used to build the actual grid,
         // it's just to remove the card from the player's hand
@@ -571,9 +631,13 @@ class Bandido extends Table
         // Active next player
         $player_id = $this->activeNextPlayer();
 
+        // Increment the number of turns statistic
+        $this->incStat(1, "number_of_turns");
+
         // var_dump("call gameHasEnded");
         if ($this->gameHasEnded()) {
             // var_dump("game is finished");
+            $this->computeFinalStatistics();
             $this->gamestate->nextState("endGame");
         } else {
             // todo test that they can play
@@ -581,10 +645,6 @@ class Bandido extends Table
             $this->giveExtraTime($player_id);
             $this->gamestate->nextState('nextTurn');
         }
-    }
-
-    function stGameEnd()
-    {
     }
 
     //////////////////////////////////////////////////////////////////////////////

@@ -52,48 +52,77 @@ $stats_type = array(
     // Statistics global to table
     "table" => array(
 
-        "turns_number" => array(
+        "number_of_turns" => array(
             "id" => 10,
             "name" => totranslate("Number of turns"),
             "type" => "int"
         ),
 
-        /*
-        Examples:
+        "cards_in_deck" => array(
+            "id" => 11,
+            "name" => totranslate("Cards left in deck"),
+            "type" => "int"
+        ),
 
+        "longest_path" => array(
+            "id" => 12,
+            "name" => totranslate("Longest path from starting card"),
+            "type" => "int"
+        ),
 
-        "table_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("table test stat 1"), 
-                                "type" => "int" ),
-                                
-        "table_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("table test stat 2"), 
-                                "type" => "float" )
-*/
+        "exits_opened" => array(
+            "id" => 13,
+            "name" => totranslate("Number of exits opened"),
+            "type" => "int"
+        ),
+
+        "exits_closed" => array(
+            "id" => 14,
+            "name" => totranslate("Number of exits closed"),
+            "type" => "int"
+        ),
+
+        "open_close_ratio" => array(
+            "id" => 15,
+            "name" => totranslate("Ratio of exits opened vs. exits closed"),
+            "type" => "int"
+        ),
+
     ),
 
     // Statistics existing for each player
     "player" => array(
 
-        "turns_number" => array(
-            "id" => 10,
-            "name" => totranslate("Number of turns"),
+        "cards_played" => array(
+            "id" => 11,
+            "name" => totranslate("Number of cards played"),
             "type" => "int"
         ),
 
-        /*
-        Examples:    
-        
-        
-        "player_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("player test stat 1"), 
-                                "type" => "int" ),
-                                
-        "player_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("player test stat 2"), 
-                                "type" => "float" )
+        "exits_opened" => array(
+            "id" => 12,
+            "name" => totranslate("Number of exits opened"),
+            "type" => "int"
+        ),
 
-*/
+        "exits_closed" => array(
+            "id" => 13,
+            "name" => totranslate("Number of exits closed"),
+            "type" => "int"
+        ),
+
+        "exits_maintained" => array(
+            "id" => 14,
+            "name" => totranslate("Number of cards played that maintained the exit number"),
+            "type" => "int"
+        ),
+
+        "open_close_ratio" => array(
+            "id" => 15,
+            "name" => totranslate("Ratio of exits opened vs. exits closed"),
+            "type" => "int"
+        ),
+
     )
 
 );
