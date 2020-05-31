@@ -116,6 +116,8 @@ define([
                 switch (stateName) {
                     case 'playerTurn':
                         this.possibleMoves = args.args.possibleMoves;
+                        // Display possible moves in the case where the player already selected a card
+                        this.updatePossibleMoves();
                         break;
                 }
             },
@@ -262,6 +264,10 @@ define([
              * Takes into account card and rotation.
              */
             updatePossibleMoves: function () {
+                if (!this.isCurrentPlayerActive() || !this.card) {
+                    // Display possible moves only if the player is active and a card is selected
+                    return;
+                }
                 dojo.query('.possiblemove').forEach(dojo.destroy);
 
                 var cardRotation = this.cardRotations[this.card.id];
@@ -349,7 +355,7 @@ define([
 
             onDebugComputePossibleMoves: function (evt) {
                 dojo.stopEvent(evt);
-                
+
                 this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
                     rotation: this.cardRotations[this.card.id],
                     cardId: this.card.id,
@@ -371,9 +377,8 @@ define([
                 var divId = this.playerHand.getItemDivId(item_id);
                 var cardDiv = dojo.query("#" + divId);
                 var leftPos = parseInt(cardDiv[0].style.left, 10) + this.cardwidth / 2;
-
                 this.divIdToRotate = divId;
-                // 24 is the rotate image size
+                // 24 is the arrow image size
                 dojo.place(this.format_block('jstpl_rotateleft', { left: leftPos - 24 }), $("playerhand"));
                 dojo.place(this.format_block('jstpl_rotateright', { left: leftPos }), $("playerhand"));
                 dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
@@ -466,8 +471,7 @@ define([
                 console.log('notif_addCardToHand');
                 console.log(notif);
 
-                if (notif.args.cardDrawn != null)
-                {
+                if (notif.args.cardDrawn != null) {
                     this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
                     this.cardRotations[notif.args.cardDrawn.id] = 0;
                 }
