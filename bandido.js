@@ -466,8 +466,11 @@ define([
                 console.log('notif_addCardToHand');
                 console.log(notif);
 
-                this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
-                this.cardRotations[notif.args.cardDrawn.id] = 0;
+                if (notif.args.cardDrawn != null)
+                {
+                    this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
+                    this.cardRotations[notif.args.cardDrawn.id] = 0;
+                }
             },
 
             notif_changeHand: function (notif) {

@@ -1,8 +1,8 @@
 <?php
 
 /**
- *------
- * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+         *------
+         * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
  * Bandido implementation : © <Your name here> <Your email address here>
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
@@ -91,7 +91,7 @@ class Bandido extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         BNDExitMap::Initialize();
-        
+
         for ($value = 0; $value < 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
         }
@@ -160,7 +160,13 @@ class Bandido extends Table
     {
         $cardsInLocations = $this->cards->countCardsInLocations();
         $cardCount = self::getUniqueValueFromDB("SELECT count(*) FROM card");
-        $cardsToPlace = $cardsInLocations['deck'] + $cardsInLocations['hand'];
+        $cardsToPlace = 0;
+        if (array_key_exists('hand', $cardsInLocations)) {
+            $cardsToPlace += $cardsInLocations['hand'];
+        }
+        if (array_key_exists('deck', $cardsInLocations)) {
+            $cardsToPlace += $cardsInLocations['deck'];
+        }
         return 100 * ($cardCount - $cardsToPlace) / $cardCount;
     }
 
@@ -322,27 +328,25 @@ class Bandido extends Table
     {
         /** Check if the active player can play */
         $active_player_id = $this->getActivePlayerId();
-        $this->computePossibleMoves($active_player_id);
-        $sqlGetMoves = sprintf(
-            "SELECT locations FROM playermoves WHERE player_id=%d",
-            $active_player_id
-        );
-        if (count(self::getCollectionFromDB($sqlGetMoves))) {
+
+        if ($this->computePossibleMoves($active_player_id)) {
             return false;
         }
 
         /** If the active player can't play, check if any other play can play */
-        $otherplayers = array_diff(self::loadPlayersBasicInfos(), array($active_player_id));
+        $otherplayers = self::loadPlayersBasicInfos();
+        unset($otherplayers[$active_player_id]);
 
-        foreach ($otherplayers as $player_id) {
-            $cards = $this->cards->getCardsInLocation('hand', $player_id);
+        foreach ($otherplayers as $player) {
+            $cards = $this->cards->getCardsInLocation('hand', $player['player_id']);
+
             if ($this->computePossibleMoves(null, $cards)) {
                 return false;
             }
         }
 
         /** If no one can play, check if there is at least one card left in the deck that can be played */
-        $deckCards = self::getCardsInLocation('deck');
+        $deckCards = $this->cards->getCardsInLocation('deck');
         return !($this->computePossibleMoves(null, $deckCards));
     }
 
@@ -352,7 +356,7 @@ class Bandido extends Table
         // var_dump(BNDGrid::getPlayableLocations());
         if (count(BNDGrid::getPlayableLocations()) == 0) {
             $this->playersWin = true;
-            self::DbQuery( "UPDATE player SET player_score=1");
+            self::DbQuery("UPDATE player SET player_score=1");
         }
         if (self::gameWins()) {
             $this->gameWins = true;
@@ -400,8 +404,12 @@ class Bandido extends Table
 
     function computePossibleMoves($player_id, $cards = null)
     {
-        if ($cards == null) {
+        $foundPossibleMove = false;
+        if ($cards == null && $player_id != null) {
             $cards = $this->cards->getCardsInLocation('hand', $player_id);
+        }
+        if (count($cards) == 0) {
+            return false;
         }
         $playableLocations = BNDGrid::getPlayableLocations();
 
@@ -416,15 +424,15 @@ class Bandido extends Table
                     // var_dump($location);
                     // var_dump("rotation");
                     // var_dump($rotation);
-                    if (self::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
+                    if ($this->cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
                         // var_dump("Card can be placed");
                         array_push($tempPossibleMoves, $location);
                     }
 
-                    $other_location = self::getPlayableLocationForOtherSubcard($location[0], $location[1], $rotation);
+                    $other_location = $this->getPlayableLocationForOtherSubcard($location[0], $location[1], $rotation);
                     // var_dump("Testing other location :");
                     // var_dump($other_location);
-                    if (self::cardCanBePlaced(
+                    if ($this->cardCanBePlaced(
                         $card['type_arg'],
                         $other_location[0],
                         $other_location[1],
@@ -439,6 +447,7 @@ class Bandido extends Table
                     if ($player_id == null) {
                         return true;
                     }
+                    $foundPossibleMove = true;
 
                     $locations = serialize(array_unique($tempPossibleMoves, 0));
                     $sqlInsert = sprintf(
@@ -456,7 +465,7 @@ class Bandido extends Table
                 }
             }
         }
-        return false;
+        return $foundPossibleMove;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -502,7 +511,7 @@ class Bandido extends Table
             'rotation' => $rotation
         ));
 
-        // Pick a new card forn the player
+        // Pick a new card for the player
         $cardDrawn = $this->cards->pickCard('deck', $player_id);
         // Notify active player about the card he's redrawn
         self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
@@ -576,7 +585,6 @@ class Bandido extends Table
 
     function stGameEnd()
     {
-
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -632,8 +640,8 @@ class Bandido extends Table
         Database scheme.
         In this case, if you change your Database scheme, you just have to apply the needed changes in order to
         update the game database and allow the game to continue to run with your new version.
-    
-    */
+        
+        */
 
     function upgradeTableDb($from_version)
     {
