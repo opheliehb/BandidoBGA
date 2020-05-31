@@ -492,7 +492,11 @@ class Bandido extends Table
                     }
                     $foundPossibleMove = true;
 
-                    $locations = serialize(array_unique($tempPossibleMoves, 0));
+                    /** array_values(array_unique()) used to have unique values
+                     * but not preserve keys so it's undesrtood as an array, not a dictionary,
+                     * by the client
+                     */
+                    $locations = serialize(array_values(array_unique($tempPossibleMoves, 0)));
                     $sqlInsert = sprintf(
                         "INSERT INTO playermoves VALUES ( '%d', '%d', '%d', '%s' )
                         ON DUPLICATE KEY UPDATE locations='%s'",

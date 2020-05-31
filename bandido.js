@@ -83,7 +83,7 @@ define([
 
                 this.placeCardsOnGrid(this.gamedatas.grid);
 
-                this.possibleMoves = this.gamedatas.possibleMoves;
+                this.possibleMoves = this.getSortedPossibleMoves(this.gamedatas.possibleMoves);
 
                 /** Begin scrollmap setup */
                 this.scrollmap.create(
@@ -115,7 +115,7 @@ define([
 
                 switch (stateName) {
                     case 'playerTurn':
-                        this.possibleMoves = args.args.possibleMoves;
+                        this.possibleMoves = this.getSortedPossibleMoves(args.args.possibleMoves);
                         // Display possible moves in the case where the player already selected a card
                         this.updatePossibleMoves();
                         break;
@@ -274,13 +274,12 @@ define([
                 dojo.query('.possiblemove').forEach(dojo.destroy);
 
                 // Return immediately if there is no possible move for the selected card
-                if(!this.possibleMoves[this.card.id]) {
+                if (!this.possibleMoves[this.card.id]) {
                     return;
                 }
 
                 var cardRotation = this.cardRotations[this.card.id];
-                
-                
+
                 for (var idx in this.possibleMoves[this.card.id][cardRotation]) {
                     var possibleMove = this.possibleMoves[this.card.id][cardRotation][idx];
 
@@ -325,6 +324,25 @@ define([
                 }).play();
 
 
+            },
+
+            getSortedPossibleMoves: function (oldPossibleMoves) {
+                /** sort possible moves so that the div are displayed in order and no div gets 
+                 * un-clickable because it's hidden behind 2 others
+                */
+                var possibleMoves = {};
+                for (var cardId in oldPossibleMoves) {
+                    possibleMoves[cardId] = {};
+                    for (var rotation in oldPossibleMoves[cardId]) {
+                        possibleMoves[cardId][rotation] = oldPossibleMoves[cardId][rotation].sort(function (a, b) {
+                            if (a[0] == b[0]) {
+                                return a[1] - b[1];
+                            }
+                            return a[0] - b[0];
+                        });
+                    }
+                }
+                return possibleMoves;
             },
 
             ///////////////////////////////////////////////////
@@ -443,7 +461,6 @@ define([
                 }
             },
 
-
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
 
@@ -462,8 +479,6 @@ define([
                 dojo.subscribe('cardDrawn', this, "notif_addCardToHand");
                 dojo.subscribe('changeHand', this, "notif_changeHand");
             },
-
-
 
             notif_cardPlayed: function (notif) {
                 console.log('notif_cardPlayed');
