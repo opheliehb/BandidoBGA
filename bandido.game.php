@@ -1,8 +1,8 @@
 <?php
 
 /**
-         *------
-         * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+ *------
+ * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
  * Bandido implementation : © <Your name here> <Your email address here>
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
@@ -609,8 +609,14 @@ class Bandido extends Table
 
     function argPossibleMoves()
     {
+        $possibleMoves = $this->getPossibleMoves($this->getActivePlayerId());
+        $action = "play a card";
+        if (empty($possibleMoves)) {
+            $action = "change your hand";
+        }
         return array(
-            'possibleMoves' => $this->getPossibleMoves($this->getActivePlayerId())
+            'possibleMoves' => $this->getPossibleMoves($this->getActivePlayerId()),
+            'action' => $action
         );
     }
 
