@@ -78,7 +78,6 @@ $gameinfos = array(
     // Is this game cooperative (all players wins together or loose together)
     'is_coop' => 1,
 
-
     // Complexity of the game, from 0 (extremely simple) to 5 (extremely complex)
     'complexity' => 1,
 

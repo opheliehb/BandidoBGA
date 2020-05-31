@@ -85,7 +85,7 @@ $stats_type = array(
         "open_close_ratio" => array(
             "id" => 15,
             "name" => totranslate("Ratio of exits opened vs. exits closed"),
-            "type" => "int"
+            "type" => "float"
         ),
 
     ),
@@ -120,7 +120,7 @@ $stats_type = array(
         "open_close_ratio" => array(
             "id" => 15,
             "name" => totranslate("Ratio of exits opened vs. exits closed"),
-            "type" => "int"
+            "type" => "float"
         ),
 
     )

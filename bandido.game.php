@@ -351,6 +351,11 @@ class Bandido extends Table
         }
         if (self::gameWins()) {
             $this->gameWins = true;
+            if (count(self::loadPlayersBasicInfos()) == 1)
+            {
+                /** to lose a solo game, your score miust be negative or else it logs a victory */
+                self::DbQuery("UPDATE player SET player_score=-1");
+            }
         }
         return ($this->playersWin || $this->gameWins);
     }
