@@ -188,6 +188,9 @@ define([
                             this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
                             this.addActionButton('debug change hand', _('debugchangehand'), 'onDebugChangeHand');
                             this.addActionButton('debug compute possible moves', _('debugcomputepossiblemoves'), 'onDebugComputePossibleMoves');
+                            if (args.possibleMoves.length == 0) {
+                                this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
+                            }
                             break;
                     }
                 }
@@ -270,8 +273,14 @@ define([
                 }
                 dojo.query('.possiblemove').forEach(dojo.destroy);
 
-                var cardRotation = this.cardRotations[this.card.id];
+                // Return immediately if there is no possible move for the selected card
+                if(!this.possibleMoves[this.card.id]) {
+                    return;
+                }
 
+                var cardRotation = this.cardRotations[this.card.id];
+                
+                
                 for (var idx in this.possibleMoves[this.card.id][cardRotation]) {
                     var possibleMove = this.possibleMoves[this.card.id][cardRotation][idx];
 
@@ -345,6 +354,12 @@ define([
                 this.placeCardDiv(this.getPossibleMoveId(x, y, rotation), { x: x, y: y, rotation: rotation });
 
                 dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
+            },
+
+            onChangeHand: function (evt) {
+                dojo.stopEvent(evt);
+
+                this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
             },
 
             onDebugChangeHand: function (evt) {
@@ -458,7 +473,7 @@ define([
                     this.playerHand.removeFromStock(
                         notif.args.card_type,
                         this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation));
-                        
+
                     this.card = null;
                     dojo.query('.possiblemove').forEach(dojo.destroy);
                     dojo.query('.manipulation-arrow').forEach(dojo.destroy);
@@ -482,11 +497,16 @@ define([
                 console.log('notif_addCardToHand');
                 console.log(notif);
 
+                // Remove cards from the player hand and add the new cards
                 this.playerHand.removeAllTo('deck');
                 for (var newCardIdx in notif.args.newHand) {
                     var newCard = notif.args.newHand[newCardIdx];
                     this.playerHand.addToStockWithId(newCard.type_arg, newCard.id);
+                    // Reset cardRotations 
+                    this.cardRotations[newCard.id] = 0;
                 }
+                // Reset selected card
+                this.card = null;
             },
         });
     });
