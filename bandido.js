@@ -458,7 +458,8 @@ define([
                     this.playerHand.removeFromStock(
                         notif.args.card_type,
                         this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation));
-
+                        
+                    this.card = null;
                     dojo.query('.possiblemove').forEach(dojo.destroy);
                     dojo.query('.manipulation-arrow').forEach(dojo.destroy);
                 }
