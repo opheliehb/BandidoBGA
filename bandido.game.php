@@ -543,13 +543,10 @@ class Bandido extends Table
          * the diff between the 2 is the number of exits that have been added/removed from the game
          */
         if ($exits_opened > $exits_closed) {
-            var_dump('1');
             $this->incStat($exits_opened - $exits_closed, "exits_opened", $player_id);
         } else if ($exits_opened < $exits_closed) {
-            var_dump('2');
             $this->incStat($exits_closed - $exits_opened, "exits_closed", $player_id);
         } else {
-            var_dump('3');
             $this->incStat(1, "exits_maintained", $player_id);
         }
         $this->incStat(1, "cards_played", $player_id);
