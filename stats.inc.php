@@ -82,9 +82,12 @@ $stats_type = array(
             "type" => "int"
         ),
 
+        /** We display the ratio as a % because the floating numbers, despite being correct in DB, display as int
+         * in the end game board
+         */
         "open_close_ratio" => array(
             "id" => 15,
-            "name" => totranslate("Ratio of exits opened vs. exits closed"),
+            "name" => totranslate("Ratio (%) of exits closed vs. exits opened"),
             "type" => "float"
         ),
 
@@ -117,9 +120,12 @@ $stats_type = array(
             "type" => "int"
         ),
 
+        /** We display the ratio as a % because the floating numbers, despite being correct in DB, display as int
+         * in the end game board
+         */
         "open_close_ratio" => array(
             "id" => 15,
-            "name" => totranslate("Ratio of exits opened vs. exits closed"),
+            "name" => totranslate("Ratio (%) of exits closed vs. exits opened"),
             "type" => "float"
         ),
 

@@ -188,11 +188,15 @@ class Bandido extends Table
         }
     }
 
-    function gameWins()
+    function computeWinner()
     {
+        if (count(BNDGrid::getPlayableLocations()) == 0) {
+            $this->playersWin = true;
+            return true;
+        }
+
         /** Check if the active player can play */
         $active_player_id = $this->getActivePlayerId();
-
         if ($this->computePossibleMoves($active_player_id)) {
             return false;
         }
@@ -211,25 +215,31 @@ class Bandido extends Table
 
         /** If no one can play, check if there is at least one card left in the deck that can be played */
         $deckCards = $this->cards->getCardsInLocation('deck');
-        return !($this->computePossibleMoves(null, $deckCards));
+        if ($this->computePossibleMoves(null, $deckCards)) {
+            return false;
+        }
+
+        $this->gameWins = true;
+        return true;
     }
 
     function gameHasEnded()
     {
-        // var_dump("BNDGrid::getPlayableLocations()");
-        // var_dump(BNDGrid::getPlayableLocations());
-        if (count(BNDGrid::getPlayableLocations()) == 0) {
-            $this->playersWin = true;
+        if (!$this->computeWinner()) {
+            return false;
+        }
+
+        if ($this->playersWin) {
             self::DbQuery("UPDATE player SET player_score=1");
         }
-        if (self::gameWins()) {
-            $this->gameWins = true;
+        else if ($this->gameWins) {
             if (count(self::loadPlayersBasicInfos()) == 1) {
-                /** to lose a solo game, your score miust be negative or else it logs a victory */
+                /** to lose a solo game, your score must be negative or else it logs a victory */
                 self::DbQuery("UPDATE player SET player_score=-1");
             }
         }
-        return ($this->playersWin || $this->gameWins);
+        
+        return true;
     }
 
     function dealStartingCards()
@@ -274,10 +284,10 @@ class Bandido extends Table
             $player_id = $player['player_id'];
             $exits_opened_player = $this->getStat("exits_opened", $player_id);
             $exits_closed_player = $this->getStat("exits_closed", $player_id);
-            if ($exits_closed_player != 0) {
-                $open_close_ratio = $exits_opened_player / $exits_closed_player;
+            if ($exits_opened_player != 0) {
+                $open_close_ratio = ((float) $exits_closed_player / $exits_opened_player) * 100;
             } else {
-                $open_close_ratio = 0;
+                $open_close_ratio = 100;
             }
             $this->setStat($open_close_ratio, "open_close_ratio", $player_id);
 
@@ -287,11 +297,12 @@ class Bandido extends Table
 
         $this->setStat($exits_opened, "exits_opened");
         $this->setStat($exits_closed, "exits_closed");
-        if ($exits_closed != 0) {
-            $this->setStat($exits_opened / $exits_closed, "open_close_ratio");
+        if ($exits_opened != 0) {
+            $open_close_ratio = ((float) $exits_closed / $exits_opened) * 100;
         } else {
-            $this->setStat(0, "open_close_ratio");
+            $open_close_ratio = 100;
         }
+        $this->setStat($open_close_ratio, "open_close_ratio");
 
         /** Get cards left in deck */
         $cards_in_deck = $this->cards->countCardInLocation('deck');
