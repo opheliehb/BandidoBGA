@@ -151,4 +151,133 @@ class BNDGrid extends APP_DbObject
         }
         return $listOfPlayableLocations;
     }
+
+    
+    public static function testExitMatchesNeighbors($currentCardExit, $neighborCardExit)
+    {
+        $canBePlaced = true;
+        if ($currentCardExit == null) {
+            // if there is no exit for the current card, the neighbor card musn't have exits either
+            $neighborHasExit = $neighborCardExit != null;
+            $canBePlaced = $canBePlaced && !$neighborHasExit;
+        } else {
+            // if there is no exit for the current card, the neighbor card must have a free exit to match
+            $canBePlaced = $canBePlaced && $neighborCardExit == -1;
+        }
+        return $canBePlaced;
+    }
+
+    public static function testExits($currentSubcard, $x, $y, $grid)
+    {
+        $canBePlaced = true;
+        $hasAtLeastOneNeighbor = false;
+
+        $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
+        if ($leftNeighborSubcard != null) {
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_left);
+            // var_dump("LEFT NEIG");
+            // var_dump($leftNeighborSubcard->_right);
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced &&
+                self::testExitMatchesNeighbors($currentSubcard->_left, $leftNeighborSubcard->_right);
+        }
+
+        $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
+        // var_dump($rightNeighborSubcard);
+        if ($rightNeighborSubcard != null) {
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_right);
+            // var_dump("RIGHT NEIG");
+            // var_dump($rightNeighborSubcard->_left);
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced &&
+                self::testExitMatchesNeighbors($currentSubcard->_right, $rightNeighborSubcard->_left);
+        }
+
+        $topNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
+        if ($topNeighborSubcard != null) {
+            $hasAtLeastOneNeighbor = true;
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_top);
+            // var_dump("TOP NEIG");
+            // var_dump($topNeighborSubcard->_bottom);
+            $canBePlaced = $canBePlaced &&
+                self::testExitMatchesNeighbors($currentSubcard->_top, $topNeighborSubcard->_bottom);
+        }
+
+        $bottomNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
+        if ($bottomNeighborSubcard != null) {
+            // var_dump("CURRENT");
+            // var_dump($currentSubcard->_right);
+            // var_dump("BOTTOM NEIG");
+            // var_dump($bottomNeighborSubcard->_top);
+            $hasAtLeastOneNeighbor = true;
+            $canBePlaced = $canBePlaced &&
+                self::testExitMatchesNeighbors($currentSubcard->_bottom, $bottomNeighborSubcard->_top);
+        }
+
+        return array($canBePlaced, $hasAtLeastOneNeighbor);
+    }
+
+    public static function cardCanBePlaced($id, $x, $y, $rotation, $grid)
+    {
+        if ($grid[$x][$y]["subcard_id"] != null) {
+            return false;
+        }
+
+        $subcard_0 = new BNDSubcard($id . "_0", $rotation);
+        $subcard_1 = new BNDSubcard($id . "_1", $rotation);
+
+        // var_dump("Testing card :");
+        // var_dump($id);
+        // var_dump("subcard 0");
+        // var_dump($subcard_0);
+        // var_dump("subcard_1");
+        // var_dump($subcard_1);
+        switch ($rotation) {
+            case 0:
+                // Check that the grid is empty where we want to place the card
+                if ($grid[$x + 1][$y]["subcard_id"] != null) {
+                    return false;
+                }
+                // Check if the subcards exits match their neighbor's and if they have at least 1 neighbor
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y, $grid);
+                break;
+            case 90:
+                // var_dump("grid[x][y + 1]");
+                // var_dump($grid[$x][$y + 1]);
+                if ($grid[$x][$y + 1]["subcard_id"] != null) {
+                    return false;
+                }
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y + 1, $grid);
+                break;
+            case 180:
+                if ($grid[$x - 1][$y]["subcard_id"] != null) {
+                    return false;
+                }
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x - 1, $y, $grid);
+                break;
+            case 270:
+                if ($grid[$x][$y - 1]["subcard_id"] != null) {
+                    return false;
+                }
+                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
+                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y - 1, $grid);
+                break;
+        }
+
+
+        // // var_dump($firstSubcardCanBePlaced);
+        // // var_dump($secondSubcardCanBePlaced);
+        // // var_dump($firstSubcardHasNeighbor);
+        // // var_dump($secondSubcardHasNeighbor);
+        return ($firstSubcardCanBePlaced &&
+            $secondSubcardCanBePlaced &&
+            ($firstSubcardHasNeighbor || $secondSubcardHasNeighbor));
+    }
+
 }

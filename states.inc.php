@@ -71,7 +71,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "argPossibleMoves",
         "possibleactions" => array("playCard", "changeHand"),
-        "transitions" => array("nextPlayer" => 3)
+        "transitions" => array("nextPlayer" => 3, "zombiePass" => 3)
     ),
     
     3 => array(

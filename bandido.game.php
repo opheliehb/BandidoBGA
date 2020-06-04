@@ -170,133 +170,6 @@ class Bandido extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
-    function testExitMatchesNeighbors($currentCardExit, $neighborCardExit)
-    {
-        $canBePlaced = true;
-        if ($currentCardExit == null) {
-            // if there is no exit for the current card, the neighbor card musn't have exits either
-            $neighborHasExit = $neighborCardExit != null;
-            $canBePlaced = $canBePlaced && !$neighborHasExit;
-        } else {
-            // if there is no exit for the current card, the neighbor card must have a free exit to match
-            $canBePlaced = $canBePlaced && $neighborCardExit == -1;
-        }
-        return $canBePlaced;
-    }
-
-    function testExits($currentSubcard, $x, $y, $grid)
-    {
-        $canBePlaced = true;
-        $hasAtLeastOneNeighbor = false;
-
-        $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
-        if ($leftNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_left);
-            // var_dump("LEFT NEIG");
-            // var_dump($leftNeighborSubcard->_right);
-            $hasAtLeastOneNeighbor = true;
-            $canBePlaced = $canBePlaced &&
-                self::testExitMatchesNeighbors($currentSubcard->_left, $leftNeighborSubcard->_right);
-        }
-
-        $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
-        // var_dump($rightNeighborSubcard);
-        if ($rightNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_right);
-            // var_dump("RIGHT NEIG");
-            // var_dump($rightNeighborSubcard->_left);
-            $hasAtLeastOneNeighbor = true;
-            $canBePlaced = $canBePlaced &&
-                self::testExitMatchesNeighbors($currentSubcard->_right, $rightNeighborSubcard->_left);
-        }
-
-        $topNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
-        if ($topNeighborSubcard != null) {
-            $hasAtLeastOneNeighbor = true;
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_top);
-            // var_dump("TOP NEIG");
-            // var_dump($topNeighborSubcard->_bottom);
-            $canBePlaced = $canBePlaced &&
-                self::testExitMatchesNeighbors($currentSubcard->_top, $topNeighborSubcard->_bottom);
-        }
-
-        $bottomNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
-        if ($bottomNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_right);
-            // var_dump("BOTTOM NEIG");
-            // var_dump($bottomNeighborSubcard->_top);
-            $hasAtLeastOneNeighbor = true;
-            $canBePlaced = $canBePlaced &&
-                self::testExitMatchesNeighbors($currentSubcard->_bottom, $bottomNeighborSubcard->_top);
-        }
-
-        return array($canBePlaced, $hasAtLeastOneNeighbor);
-    }
-
-    function cardCanBePlaced($id, $x, $y, $rotation, $grid)
-    {
-        if ($grid[$x][$y]["subcard_id"] != null) {
-            return false;
-        }
-
-        $subcard_0 = new BNDSubcard($id . "_0", $rotation);
-        $subcard_1 = new BNDSubcard($id . "_1", $rotation);
-
-        // var_dump("Testing card :");
-        // var_dump($id);
-        // var_dump("subcard 0");
-        // var_dump($subcard_0);
-        // var_dump("subcard_1");
-        // var_dump($subcard_1);
-        switch ($rotation) {
-            case 0:
-                // Check that the grid is empty where we want to place the card
-                if ($grid[$x + 1][$y]["subcard_id"] != null) {
-                    return false;
-                }
-                // Check if the subcards exits match their neighbor's and if they have at least 1 neighbor
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y, $grid);
-                break;
-            case 90:
-                // var_dump("grid[x][y + 1]");
-                // var_dump($grid[$x][$y + 1]);
-                if ($grid[$x][$y + 1]["subcard_id"] != null) {
-                    return false;
-                }
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y + 1, $grid);
-                break;
-            case 180:
-                if ($grid[$x - 1][$y]["subcard_id"] != null) {
-                    return false;
-                }
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x - 1, $y, $grid);
-                break;
-            case 270:
-                if ($grid[$x][$y - 1]["subcard_id"] != null) {
-                    return false;
-                }
-                list($firstSubcardCanBePlaced, $firstSubcardHasNeighbor) = self::testExits($subcard_0, $x, $y, $grid);
-                list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x, $y - 1, $grid);
-                break;
-        }
-
-
-        // // var_dump($firstSubcardCanBePlaced);
-        // // var_dump($secondSubcardCanBePlaced);
-        // // var_dump($firstSubcardHasNeighbor);
-        // // var_dump($secondSubcardHasNeighbor);
-        return ($firstSubcardCanBePlaced &&
-            $secondSubcardCanBePlaced &&
-            ($firstSubcardHasNeighbor || $secondSubcardHasNeighbor));
-    }
-
     function getPlayableLocationForOtherSubcard($x, $y, $rotation)
     {
         switch ($rotation) {
@@ -351,8 +224,7 @@ class Bandido extends Table
         }
         if (self::gameWins()) {
             $this->gameWins = true;
-            if (count(self::loadPlayersBasicInfos()) == 1)
-            {
+            if (count(self::loadPlayersBasicInfos()) == 1) {
                 /** to lose a solo game, your score miust be negative or else it logs a victory */
                 self::DbQuery("UPDATE player SET player_score=-1");
             }
@@ -472,7 +344,7 @@ class Bandido extends Table
                     // var_dump($location);
                     // var_dump("rotation");
                     // var_dump($rotation);
-                    if ($this->cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
+                    if (BNDGrid::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
                         // var_dump("Card can be placed");
                         array_push($tempPossibleMoves, $location);
                     }
@@ -480,7 +352,7 @@ class Bandido extends Table
                     $other_location = $this->getPlayableLocationForOtherSubcard($location[0], $location[1], $rotation);
                     // var_dump("Testing other location :");
                     // var_dump($other_location);
-                    if ($this->cardCanBePlaced(
+                    if (BNDGrid::cardCanBePlaced(
                         $card['type_arg'],
                         $other_location[0],
                         $other_location[1],
@@ -540,7 +412,7 @@ class Bandido extends Table
         $card = $this->cards->getCard($card_id);
 
         // TODO this is useless we should just look up in db
-        if (!self::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
+        if (!BNDGrid::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
             throw new feException("Invalid card placement!");
         }
 
@@ -642,6 +514,15 @@ class Bandido extends Table
     {
         // Active next player
         $player_id = $this->activeNextPlayer();
+        
+        if ($this->cards->countCardInLocation("hand", $player_id) == 0)
+        {
+            /** If this player left the game and then clicked on the "come back"
+             * button, we need to deal them some cards back
+             */
+            $newPlayerHand = $this->cards->pickCards(3, 'deck', $player_id);
+            self::notifyPlayer($player_id, "changeHand", "", array('newHand' => $newPlayerHand));
+        }
 
         // Increment the number of turns statistic
         $this->incStat(1, "number_of_turns");
@@ -678,26 +559,18 @@ class Bandido extends Table
 
     function zombieTurn($state, $active_player)
     {
-        $statename = $state['name'];
-
-        if ($state['type'] === "activeplayer") {
-            switch ($statename) {
-                default:
-                    $this->gamestate->nextState("zombiePass");
-                    break;
-            }
-
-            return;
+        /** If the player just left, we put back their cards in the deck. Else we do nothing more. */
+        if ($this->cards->countCardInLocation("hand", $active_player) != 0) {
+            $this->cards->moveAllCardsInLocation("hand", "deck", $active_player);
+            $this->notifyAllPlayers(
+                "playerLeft",
+                clienttranslate('A player left. Their hand has been sent back to the deck.'),
+                array()
+            );
+            
+            self::notifyPlayer($active_player, "changeHand", "", array('newHand' => array()));
         }
-
-        if ($state['type'] === "multipleactiveplayer") {
-            // Make sure player is in a non blocking status for role turn
-            $this->gamestate->setPlayerNonMultiactive($active_player, '');
-
-            return;
-        }
-
-        throw new feException("Zombie mode not supported at this game state: " . $statename);
+        $this->gamestate->nextState("zombiePass");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////:
