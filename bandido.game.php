@@ -1,8 +1,8 @@
 <?php
 
 /**
- *------
- * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+         *------
+         * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
  * Bandido implementation : © <Your name here> <Your email address here>
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
@@ -472,7 +472,12 @@ class Bandido extends Table
 
         // Notify active player about their new cards
         $newPlayerHand = $this->cards->pickCards(3, 'deck', $player_id);
-        self::notifyPlayer($player_id, "changeHand", "", array('newHand' => $newPlayerHand));
+        $this->notifyPlayer($player_id, "changeHand", "", array('newHand' => $newPlayerHand));
+        $this->notifyAllPlayers(
+            "playerChangedHand",
+            clienttranslate('${player_name} could not play and changer their hand'),
+            array('player_name' => $this->getActivePlayerName())
+        );
 
         $this->gamestate->nextState("nextPlayer");
     }
@@ -514,9 +519,8 @@ class Bandido extends Table
     {
         // Active next player
         $player_id = $this->activeNextPlayer();
-        
-        if ($this->cards->countCardInLocation("hand", $player_id) == 0)
-        {
+
+        if ($this->cards->countCardInLocation("hand", $player_id) == 0) {
             /** If this player left the game and then clicked on the "come back"
              * button, we need to deal them some cards back
              */
@@ -567,7 +571,7 @@ class Bandido extends Table
                 clienttranslate('A player left. Their hand has been sent back to the deck.'),
                 array()
             );
-            
+
             self::notifyPlayer($active_player, "changeHand", "", array('newHand' => array()));
         }
         $this->gamestate->nextState("zombiePass");
