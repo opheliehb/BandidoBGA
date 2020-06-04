@@ -60,7 +60,7 @@
 
     var jstpl_cardontable = '<div class="cardontable"\
                               id="cardontable_${id}"\
-                              style="background-position:-${x}px -${y}px">\
+                              style="background-position:0px -${y}px">\
                             </div>';
 
     var jstpl_rotateleft = '<img src="{GAMETHEMEURL}img/rotate.svg" \

@@ -33,12 +33,14 @@ class BNDGrid extends APP_DbObject
         }
 
         $grid = BNDGrid::GetFullGrid();
-        self::placeCard($supercardId, 0, 0, 0);
+        self::placeCard($supercardId, 0, 0, 0, $grid);
     }
 
-    public static function placeCard($id, $x, $y, $rotation)
+    /** Place a card on the grid by placing the 2 subcards one after the other.
+     * Returns the exits opened and closed for player stats.
+     */
+    public static function placeCard($id, $x, $y, $rotation, $grid)
     {
-        $grid = self::GetFullGrid();
         switch ($rotation) {
             case 0:
                 list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
@@ -60,6 +62,10 @@ class BNDGrid extends APP_DbObject
         return array($exits_opened_0 + $exits_opened_1, $exits_closed_0 + $exits_closed_1);
     }
 
+    /** Place a subcard on the grid by inserting it in the DB.
+     * Updates the neighbors subcards so that all cards connect.
+     * Computes the exits opened and closed for player stats and returns them.
+     */
     public static function placeSubcard($id, $x, $y, $rotation, $grid)
     {
         $exits_closed = 0;
@@ -73,8 +79,7 @@ class BNDGrid extends APP_DbObject
                 $exits_closed++;
                 $subcard->setLeftExit($leftNeighborSubcard->_card_id);
                 $leftNeighborSubcard->setRightExit($subcard->_card_id);
-            }
-            else {
+            } else {
                 $exits_opened++;
             }
         }
@@ -84,8 +89,7 @@ class BNDGrid extends APP_DbObject
                 $exits_closed++;
                 $subcard->setRightExit($rightNeighborSubcard->_card_id);
                 $rightNeighborSubcard->setLeftExit($subcard->_card_id);
-            }
-            else {
+            } else {
                 $exits_opened++;
             }
         }
@@ -95,8 +99,7 @@ class BNDGrid extends APP_DbObject
                 $exits_closed++;
                 $subcard->setTopExit($topNeighborSubcard->_card_id);
                 $topNeighborSubcard->setBottomExit($subcard->_card_id);
-            }
-            else {
+            } else {
                 $exits_opened++;
             }
         }
@@ -106,8 +109,7 @@ class BNDGrid extends APP_DbObject
                 $exits_closed++;
                 $subcard->setBottomExit($bottomNeighborSubcard->_card_id);
                 $bottomNeighborSubcard->setTopExit($subcard->_card_id);
-            }
-            else {
+            } else {
                 $exits_opened++;
             }
         }
@@ -152,7 +154,7 @@ class BNDGrid extends APP_DbObject
         return $listOfPlayableLocations;
     }
 
-    
+
     public static function testExitMatchesNeighbors($currentCardExit, $neighborCardExit)
     {
         $canBePlaced = true;
@@ -279,5 +281,4 @@ class BNDGrid extends APP_DbObject
             $secondSubcardCanBePlaced &&
             ($firstSubcardHasNeighbor || $secondSubcardHasNeighbor));
     }
-
 }

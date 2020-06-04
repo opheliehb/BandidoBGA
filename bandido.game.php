@@ -411,12 +411,11 @@ class Bandido extends Table
         $grid = BNDGrid::GetFullGrid();
         $card = $this->cards->getCard($card_id);
 
-        // TODO this is useless we should just look up in db
         if (!BNDGrid::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
             throw new feException("Invalid card placement!");
         }
 
-        list($exits_opened, $exits_closed) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
+        list($exits_opened, $exits_closed) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation, $grid);
 
         /** Handle open/close exits stats
          * exits opened = number of exits added by the player
@@ -537,7 +536,6 @@ class Bandido extends Table
             $this->computeFinalStatistics();
             $this->gamestate->nextState("endGame");
         } else {
-            // todo test that they can play
             // This player can play. Give him some extra time
             $this->giveExtraTime($player_id);
             $this->gamestate->nextState('nextTurn');

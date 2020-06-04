@@ -56,8 +56,6 @@ define([
                 // Setting up player boards
                 for (var player_id in gamedatas.players) {
                     var player = gamedatas.players[player_id];
-
-                    // TODO: Setting up players boards if needed
                 }
 
                 this.playerHand = new ebg.stock();
@@ -210,8 +208,7 @@ define([
             placeCard: function (card_id, position) {
                 var backgroundpos_y = card_id * this.cardheight;
                 dojo.place(
-                    // TODO change jstpl_cardontable because x is always 0
-                    this.format_block('jstpl_cardontable', { id: card_id, x: 0, y: backgroundpos_y }),
+                    this.format_block('jstpl_cardontable', { id: card_id, y: backgroundpos_y }),
                     $('map_scrollable'));
 
                 var divid = 'cardontable_' + card_id;
