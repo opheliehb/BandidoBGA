@@ -327,12 +327,6 @@ class Bandido extends Table
         return $locations;
     }
 
-    function debugGetPossibleMoves($card_id, $rotation)
-    {
-        $cards = $this->cards->getCards(array($card_id));
-        $this->computePossibleMoves($this->getActivePlayerId(), $cards);
-    }
-
     function computePossibleMoves($player_id, $cards = null)
     {
         $foundPossibleMove = false;

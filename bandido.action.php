@@ -56,13 +56,4 @@ class action_bandido extends APP_GameAction
     self::ajaxResponse();
   }
 
-  public function getPossibleMoves()
-  {
-    self::setAjaxMode();
-    $cardId = self::getArg("cardId", AT_posint, true);
-    $rotation = self::getArg("rotation", AT_int, true);
-    $this->game->debugGetPossibleMoves($cardId, $rotation);
-    self::ajaxResponse();
-  }
-
 }

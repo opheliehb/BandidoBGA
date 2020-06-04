@@ -183,9 +183,6 @@ define([
                 if (this.isCurrentPlayerActive()) {
                     switch (stateName) {
                         case 'playerTurn':
-                            this.addActionButton('debug', _('debug'), 'onDebugPlaceCard');
-                            this.addActionButton('debug change hand', _('debugchangehand'), 'onDebugChangeHand');
-                            this.addActionButton('debug compute possible moves', _('debugcomputepossiblemoves'), 'onDebugComputePossibleMoves');
                             if (args.possibleMoves.length == 0) {
                                 this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
                             }
@@ -356,42 +353,12 @@ define([
             
             */
 
-            onDebugPlaceCard: function (evt) {
-                dojo.stopEvent(evt);
-
-                var x = 0;
-                var y = -1;
-                var rotation = 270;
-
-                dojo.place(
-                    "<div id=" + this.getPossibleMoveId(x, y, rotation) + " class=possiblemove></div>",
-                    $('map_scrollable_oversurface'));
-                this.placeCardDiv(this.getPossibleMoveId(x, y, rotation), { x: x, y: y, rotation: rotation });
-
-                dojo.query('.possiblemove').connect('onclick', this, 'onClickPossibleMove');
-            },
-
             onChangeHand: function (evt) {
                 dojo.stopEvent(evt);
 
                 this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
             },
-
-            onDebugChangeHand: function (evt) {
-                dojo.stopEvent(evt);
-
-                this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
-            },
-
-            onDebugComputePossibleMoves: function (evt) {
-                dojo.stopEvent(evt);
-
-                this.ajaxcall("/bandido/bandido/getPossibleMoves.html", {
-                    rotation: this.cardRotations[this.card.id],
-                    cardId: this.card.id,
-                }, this, function (result) { });
-            },
-
+            
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
                 if (cards.length === 0) {
