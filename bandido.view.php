@@ -41,43 +41,6 @@ class view_bandido_bandido extends game_view
 
     /*********** Place your code below:  ************/
 
-
-    /*
-        
-        // Examples: set the value of some element defined in your tpl file like this: {MY_VARIABLE_ELEMENT}
-
-        // Display a specific number / string
-        $this->tpl['MY_VARIABLE_ELEMENT'] = $number_to_display;
-
-        // Display a string to be translated in all languages: 
-        $this->tpl['MY_VARIABLE_ELEMENT'] = self::_("A string to be translated");
-
-        // Display some HTML content of your own:
-        $this->tpl['MY_VARIABLE_ELEMENT'] = self::raw( $some_html_code );
-        
-        */
-
-    /*
-        
-        // Example: display a specific HTML block for each player in this game.
-        // (note: the block is defined in your .tpl file like this:
-        //      <!-- BEGIN myblock --> 
-        //          ... my HTML code ...
-        //      <!-- END myblock --> 
-        
-
-        $this->page->begin_block( "bandido_bandido", "myblock" );
-        foreach( $players as $player )
-        {
-            $this->page->insert_block( "myblock", array( 
-                                                    "PLAYER_NAME" => $player['player_name'],
-                                                    "SOME_VARIABLE" => $some_value
-                                                    ...
-                                                     ) );
-        }
-        
-        */
-
     /** Begin scrollmap enlarge display */
     $this->tpl['LABEL_ENLARGE_DISPLAY'] = self::_("Enlarge display");
     /** End scrollmap enlarge display */

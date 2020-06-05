@@ -41,8 +41,8 @@ class Bandido extends Table
         $this->cards = self::getNew("module.common.deck");
         $this->cards->init("card");
 
-        $this->gameWins = false;
-        $this->playersWin = false;
+        $this->game_wins = false;
+        $this->players_win = false;
     }
 
     protected function getGameName()
@@ -81,7 +81,7 @@ class Bandido extends Table
 
         $this->initGameStatistics();
 
-        BNDExitMap::Initialize();
+        BNDExitMap::initialize($this->initial_card_exits);
 
         for ($value = 0; $value < 69; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
@@ -90,7 +90,7 @@ class Bandido extends Table
         $this->cards->createCards($cards, 'deck');
         $this->dealStartingCards();
 
-        BNDGrid::InitializeGrid(self::getGameStateValue('supercardId'));
+        BNDGrid::initializeGrid(self::getGameStateValue('supercardId'));
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -126,7 +126,7 @@ class Bandido extends Table
         // supercard id
         $result['supercard_id'] = self::getGameStateValue('supercardId');
 
-        $result['grid'] = BNDGrid::GetGrid();
+        $result['grid'] = BNDGrid::getGrid();
 
 
         $active_player_id = $this->getActivePlayerId();
@@ -149,16 +149,16 @@ class Bandido extends Table
     */
     function getGameProgression()
     {
-        $cardsInLocations = $this->cards->countCardsInLocations();
-        $cardCount = self::getUniqueValueFromDB("SELECT count(*) FROM card");
-        $cardsToPlace = 0;
-        if (array_key_exists('hand', $cardsInLocations)) {
-            $cardsToPlace += $cardsInLocations['hand'];
+        $cards_in_locations = $this->cards->countCardsInLocations();
+        $card_count = self::getUniqueValueFromDB("SELECT count(*) FROM card");
+        $cards_to_place = 0;
+        if (array_key_exists('hand', $cards_in_locations)) {
+            $cards_to_place += $cards_in_locations['hand'];
         }
-        if (array_key_exists('deck', $cardsInLocations)) {
-            $cardsToPlace += $cardsInLocations['deck'];
+        if (array_key_exists('deck', $cards_in_locations)) {
+            $cards_to_place += $cards_in_locations['deck'];
         }
-        return 100 * ($cardCount - $cardsToPlace) / $cardCount;
+        return 100 * ($card_count - $cards_to_place) / $card_count;
     }
 
 
@@ -191,7 +191,7 @@ class Bandido extends Table
     function computeWinner()
     {
         if (count(BNDGrid::getPlayableLocations()) == 0) {
-            $this->playersWin = true;
+            $this->players_win = true;
             return true;
         }
 
@@ -202,10 +202,10 @@ class Bandido extends Table
         }
 
         /** If the active player can't play, check if any other play can play */
-        $otherplayers = self::loadPlayersBasicInfos();
-        unset($otherplayers[$active_player_id]);
+        $other_players = self::loadPlayersBasicInfos();
+        unset($other_players[$active_player_id]);
 
-        foreach ($otherplayers as $player) {
+        foreach ($other_players as $player) {
             $cards = $this->cards->getCardsInLocation('hand', $player['player_id']);
 
             if ($this->computePossibleMoves(null, $cards)) {
@@ -214,12 +214,12 @@ class Bandido extends Table
         }
 
         /** If no one can play, check if there is at least one card left in the deck that can be played */
-        $deckCards = $this->cards->getCardsInLocation('deck');
-        if ($this->computePossibleMoves(null, $deckCards)) {
+        $deck_cards = $this->cards->getCardsInLocation('deck');
+        if ($this->computePossibleMoves(null, $deck_cards)) {
             return false;
         }
 
-        $this->gameWins = true;
+        $this->game_wins = true;
         return true;
     }
 
@@ -229,10 +229,10 @@ class Bandido extends Table
             return false;
         }
 
-        if ($this->playersWin) {
+        if ($this->players_win) {
             self::DbQuery("UPDATE player SET player_score=1");
         }
-        else if ($this->gameWins) {
+        else if ($this->game_wins) {
             if (count(self::loadPlayersBasicInfos()) == 1) {
                 /** to lose a solo game, your score must be negative or else it logs a victory */
                 self::DbQuery("UPDATE player SET player_score=-1");
@@ -311,14 +311,14 @@ class Bandido extends Table
 
     function getPossibleMoves($player_id)
     {
-        $sqlGetPossibleMoves = sprintf(
+        $sql_get_possible_moves = sprintf(
             "SELECT card_id, rotation, locations FROM playermoves WHERE player_id=%d",
             $player_id
         );
 
-        $serializedLocations = self::getDoubleKeyCollectionFromDB($sqlGetPossibleMoves);
+        $serialized_locations = self::getDoubleKeyCollectionFromDB($sql_get_possible_moves);
         $locations = array();
-        foreach ($serializedLocations as $card_id => $card_rotations) {
+        foreach ($serialized_locations as $card_id => $card_rotations) {
             foreach ($card_rotations as $rotation => $location) {
                 $locations[$card_id][$rotation] = unserialize($location["locations"]);
             }
@@ -329,22 +329,22 @@ class Bandido extends Table
 
     function computePossibleMoves($player_id, $cards = null)
     {
-        $foundPossibleMove = false;
+        $found_possible_move = false;
         if ($cards == null && $player_id != null) {
             $cards = $this->cards->getCardsInLocation('hand', $player_id);
         }
         if (count($cards) == 0) {
             return false;
         }
-        $playableLocations = BNDGrid::getPlayableLocations();
+        $playable_locations = BNDGrid::getPlayableLocations();
 
-        $grid = BNDGrid::GetFullGrid();
+        $grid = BNDGrid::getFullGrid();
         foreach ($cards as $card) {
             foreach (array(0, 90, 180, 270) as $rotation) {
-                $tempPossibleMoves = array();
-                foreach ($playableLocations as $location) {
+                $temp_possible_moves = array();
+                foreach ($playable_locations as $location) {
                     if (BNDGrid::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
-                        array_push($tempPossibleMoves, $location);
+                        array_push($temp_possible_moves, $location);
                     }
 
                     $other_location = $this->getPlayableLocationForOtherSubcard($location[0], $location[1], $rotation);
@@ -355,21 +355,21 @@ class Bandido extends Table
                         $rotation,
                         $grid
                     )) {
-                        array_push($tempPossibleMoves, $other_location);
+                        array_push($temp_possible_moves, $other_location);
                     }
                 }
 
-                if (count($tempPossibleMoves)) {
+                if (count($temp_possible_moves)) {
                     if ($player_id == null) {
                         return true;
                     }
-                    $foundPossibleMove = true;
+                    $found_possible_move = true;
 
                     /** array_values(array_unique()) used to have unique values
                      * but not preserve keys so it's undesrtood as an array, not a dictionary,
                      * by the client
                      */
-                    $locations = serialize(array_values(array_unique($tempPossibleMoves, 0)));
+                    $locations = serialize(array_values(array_unique($temp_possible_moves, 0)));
                     $sqlInsert = sprintf(
                         "INSERT INTO playermoves VALUES ( '%d', '%d', '%d', '%s' )
                         ON DUPLICATE KEY UPDATE locations='%s'",
@@ -384,7 +384,7 @@ class Bandido extends Table
                 }
             }
         }
-        return $foundPossibleMove;
+        return $found_possible_move;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -403,7 +403,7 @@ class Bandido extends Table
 
         $player_id = $this->getActivePlayerId();
 
-        $grid = BNDGrid::GetFullGrid();
+        $grid = BNDGrid::getFullGrid();
         $card = $this->cards->getCard($card_id);
 
         if (!BNDGrid::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
@@ -444,9 +444,9 @@ class Bandido extends Table
         ));
 
         // Pick a new card for the player
-        $cardDrawn = $this->cards->pickCard('deck', $player_id);
+        $card_drawn = $this->cards->pickCard('deck', $player_id);
         // Notify active player about the card he's redrawn
-        self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $cardDrawn));
+        self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $card_drawn));
 
         $this->gamestate->nextState("nextPlayer");
     }
@@ -459,14 +459,14 @@ class Bandido extends Table
         $player_id = $this->getActivePlayerId();
 
         // Move all cards from the player's hand to the bottom of the deck
-        $playerHand = $this->cards->getPlayerHand($player_id);
-        foreach ($playerHand as $card) {
+        $player_hand = $this->cards->getPlayerHand($player_id);
+        foreach ($player_hand as $card) {
             $this->cards->insertCardOnExtremePosition($card["id"], 'deck', false);
         }
 
         // Notify active player about their new cards
-        $newPlayerHand = $this->cards->pickCards(3, 'deck', $player_id);
-        $this->notifyPlayer($player_id, "changeHand", "", array('newHand' => $newPlayerHand));
+        $new_player_hand = $this->cards->pickCards(3, 'deck', $player_id);
+        $this->notifyPlayer($player_id, "changeHand", "", array('newHand' => $new_player_hand));
         $this->notifyAllPlayers(
             "playerChangedHand",
             clienttranslate('${player_name} could not play and changer their hand'),
@@ -489,9 +489,9 @@ class Bandido extends Table
 
     function argPossibleMoves()
     {
-        $possibleMoves = $this->getPossibleMoves($this->getActivePlayerId());
+        $possible_moves = $this->getPossibleMoves($this->getActivePlayerId());
         $action = "play a card";
-        if (empty($possibleMoves)) {
+        if (empty($possible_moves)) {
             $action = "change your hand";
         }
         return array(
@@ -518,8 +518,8 @@ class Bandido extends Table
             /** If this player left the game and then clicked on the "come back"
              * button, we need to deal them some cards back
              */
-            $newPlayerHand = $this->cards->pickCards(3, 'deck', $player_id);
-            self::notifyPlayer($player_id, "changeHand", "", array('newHand' => $newPlayerHand));
+            $new_player_hand = $this->cards->pickCards(3, 'deck', $player_id);
+            self::notifyPlayer($player_id, "changeHand", "", array('newHand' => $new_player_hand));
         }
 
         // Increment the number of turns statistic

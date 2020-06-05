@@ -27,15 +27,16 @@ class BNDSubcard
     {
         $this->_card_id = $subcard_id;
         $this->_rotation = $rotation;
-        $origExits = BNDExitMap::get($this->_card_id);
-        $exits = $this->getRotation($origExits);
+
+        $exits_without_rotation = BNDExitMap::get($this->_card_id);
+        $exits = $this->getExitsWithRotation($exits_without_rotation);
         $this->_left = $exits[0];
         $this->_right = $exits[1];
         $this->_top = $exits[2];
         $this->_bottom = $exits[3];
     }
 
-    function getSubcard($dbsubcard)
+    static function getSubcard($dbsubcard)
     {
         if ($dbsubcard["subcard_id"]) {
             return new self($dbsubcard["subcard_id"], $dbsubcard["rotation"]);
@@ -46,45 +47,45 @@ class BNDSubcard
     function setLeftExit($exit_id)
     {
         $this->_left = $exit_id;
-        BNDExitMap::set($this->_card_id, $this->undoRotation());
+        BNDExitMap::set($this->_card_id, $this->getExitsWithoutRotation());
     }
 
     function setRightExit($exit_id)
     {
         $this->_right = $exit_id;
-        BNDExitMap::set($this->_card_id, $this->undoRotation());
+        BNDExitMap::set($this->_card_id, $this->getExitsWithoutRotation());
     }
 
     function setTopExit($exit_id)
     {
         $this->_top = $exit_id;
-        BNDExitMap::set($this->_card_id, $this->undoRotation());
+        BNDExitMap::set($this->_card_id, $this->getExitsWithoutRotation());
     }
 
     function setBottomExit($exit_id)
     {
         $this->_bottom = $exit_id;
-        BNDExitMap::set($this->_card_id, $this->undoRotation());
+        BNDExitMap::set($this->_card_id, $this->getExitsWithoutRotation());
     }
 
-    function getRotation($subcard) {
+    function getExitsWithRotation($exits) {
         switch ($this->_rotation) {
             case 0:
-                return array($subcard["_left"], $subcard["_right"], $subcard["_top"], $subcard["_bottom"]);
+                return array($exits["_left"], $exits["_right"], $exits["_top"], $exits["_bottom"]);
             break;
             case 90:
-                return array($subcard["_bottom"], $subcard["_top"], $subcard["_left"], $subcard["_right"]);
+                return array($exits["_bottom"], $exits["_top"], $exits["_left"], $exits["_right"]);
             break;
             case 180:
-                return array($subcard["_right"], $subcard["_left"], $subcard["_bottom"], $subcard["_top"]);
+                return array($exits["_right"], $exits["_left"], $exits["_bottom"], $exits["_top"]);
             break;
             case 270:
-                return array($subcard["_top"], $subcard["_bottom"], $subcard["_right"], $subcard["_left"]);
+                return array($exits["_top"], $exits["_bottom"], $exits["_right"], $exits["_left"]);
             break;
         }
     }
 
-    function undoRotation() {
+    function getExitsWithoutRotation() {
         switch ($this->_rotation) {
             case 0:
                 return array($this->_left, $this->_right, $this->_top, $this->_bottom);
