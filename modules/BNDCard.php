@@ -29,8 +29,6 @@ class BNDSubcard
         $this->_rotation = $rotation;
         $origExits = BNDExitMap::get($this->_card_id);
         $exits = $this->getRotation($origExits);
-        // var_dump($subcard_id);
-        // var_dump($exits);
         $this->_left = $exits[0];
         $this->_right = $exits[1];
         $this->_top = $exits[2];

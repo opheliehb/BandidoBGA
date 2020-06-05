@@ -100,8 +100,6 @@ class BNDExitMap extends APP_DbObject
             "SELECT _left, _right, _top, _bottom FROM exits where subcard_id='%s'",
             $dbsubcard_id
         );
-        // var_dump("Get" . $dbsubcard_id);
-        // var_dump(self::getObjectFromDB($sql));
         return self::getObjectFromDB($sql);
     }
 
@@ -115,7 +113,7 @@ class BNDExitMap extends APP_DbObject
             empty( $exits[3] ) ? "NULL": "'".$exits[3]."'",
             $dbsubcard_id
         );
-        // var_dump($sql);
+        
         self::DbQuery($sql);
     }
 }

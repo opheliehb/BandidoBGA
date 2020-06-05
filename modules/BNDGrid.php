@@ -71,8 +71,7 @@ class BNDGrid extends APP_DbObject
         $exits_closed = 0;
         $exits_opened = 0;
         $subcard = new BNDSubcard($id, $rotation);
-        // var_dump("Before     Exit Update");
-        // var_dump($subcard);
+        
         if ($subcard->_left == -1) {
             $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
             if ($leftNeighborSubcard != null) {
@@ -113,8 +112,7 @@ class BNDGrid extends APP_DbObject
                 $exits_opened++;
             }
         }
-        // var_dump("After Exit Update");
-        // var_dump($subcard);
+        
         $sqlInsert = sprintf("UPDATE grid SET subcard_id='%s', rotation=%d WHERE x=%d AND y=%d",  $id, $rotation, $x, $y);
         self::DbQuery($sqlInsert);
 
@@ -124,7 +122,6 @@ class BNDGrid extends APP_DbObject
     public static function getPlayableLocationsFromCard($subcard, $x, $y)
     {
         $playableLocations = array();
-        // var_dump($subcard);
         if ($subcard->_left == -1) {
             array_push($playableLocations, array($x - 1, $y));
         }
@@ -176,22 +173,13 @@ class BNDGrid extends APP_DbObject
 
         $leftNeighborSubcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
         if ($leftNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_left);
-            // var_dump("LEFT NEIG");
-            // var_dump($leftNeighborSubcard->_right);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_left, $leftNeighborSubcard->_right);
         }
 
         $rightNeighborSubcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
-        // var_dump($rightNeighborSubcard);
         if ($rightNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_right);
-            // var_dump("RIGHT NEIG");
-            // var_dump($rightNeighborSubcard->_left);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_right, $rightNeighborSubcard->_left);
@@ -200,20 +188,12 @@ class BNDGrid extends APP_DbObject
         $topNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
         if ($topNeighborSubcard != null) {
             $hasAtLeastOneNeighbor = true;
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_top);
-            // var_dump("TOP NEIG");
-            // var_dump($topNeighborSubcard->_bottom);
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_top, $topNeighborSubcard->_bottom);
         }
 
         $bottomNeighborSubcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
         if ($bottomNeighborSubcard != null) {
-            // var_dump("CURRENT");
-            // var_dump($currentSubcard->_right);
-            // var_dump("BOTTOM NEIG");
-            // var_dump($bottomNeighborSubcard->_top);
             $hasAtLeastOneNeighbor = true;
             $canBePlaced = $canBePlaced &&
                 self::testExitMatchesNeighbors($currentSubcard->_bottom, $bottomNeighborSubcard->_top);
@@ -231,12 +211,6 @@ class BNDGrid extends APP_DbObject
         $subcard_0 = new BNDSubcard($id . "_0", $rotation);
         $subcard_1 = new BNDSubcard($id . "_1", $rotation);
 
-        // var_dump("Testing card :");
-        // var_dump($id);
-        // var_dump("subcard 0");
-        // var_dump($subcard_0);
-        // var_dump("subcard_1");
-        // var_dump($subcard_1);
         switch ($rotation) {
             case 0:
                 // Check that the grid is empty where we want to place the card
@@ -248,8 +222,6 @@ class BNDGrid extends APP_DbObject
                 list($secondSubcardCanBePlaced, $secondSubcardHasNeighbor) = self::testExits($subcard_1, $x + 1, $y, $grid);
                 break;
             case 90:
-                // var_dump("grid[x][y + 1]");
-                // var_dump($grid[$x][$y + 1]);
                 if ($grid[$x][$y + 1]["subcard_id"] != null) {
                     return false;
                 }
@@ -272,11 +244,6 @@ class BNDGrid extends APP_DbObject
                 break;
         }
 
-
-        // // var_dump($firstSubcardCanBePlaced);
-        // // var_dump($secondSubcardCanBePlaced);
-        // // var_dump($firstSubcardHasNeighbor);
-        // // var_dump($secondSubcardHasNeighbor);
         return ($firstSubcardCanBePlaced &&
             $secondSubcardCanBePlaced &&
             ($firstSubcardHasNeighbor || $secondSubcardHasNeighbor));

@@ -339,24 +339,15 @@ class Bandido extends Table
         $playableLocations = BNDGrid::getPlayableLocations();
 
         $grid = BNDGrid::GetFullGrid();
-        // var_dump("grid[-1][1]");
-        // var_dump($grid[-1][1]);
         foreach ($cards as $card) {
             foreach (array(0, 90, 180, 270) as $rotation) {
                 $tempPossibleMoves = array();
                 foreach ($playableLocations as $location) {
-                    // var_dump("Testing location :");
-                    // var_dump($location);
-                    // var_dump("rotation");
-                    // var_dump($rotation);
                     if (BNDGrid::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
-                        // var_dump("Card can be placed");
                         array_push($tempPossibleMoves, $location);
                     }
 
                     $other_location = $this->getPlayableLocationForOtherSubcard($location[0], $location[1], $rotation);
-                    // var_dump("Testing other location :");
-                    // var_dump($other_location);
                     if (BNDGrid::cardCanBePlaced(
                         $card['type_arg'],
                         $other_location[0],
@@ -388,8 +379,7 @@ class Bandido extends Table
                         $locations,
                         $locations
                     );
-                    // var_dump("Card can be placed");
-                    // var_dump($sqlInsert);
+
                     self::DbQuery($sqlInsert);
                 }
             }
@@ -535,9 +525,7 @@ class Bandido extends Table
         // Increment the number of turns statistic
         $this->incStat(1, "number_of_turns");
 
-        // var_dump("call gameHasEnded");
         if ($this->gameHasEnded()) {
-            // var_dump("game is finished");
             $this->computeFinalStatistics();
             $this->gamestate->nextState("endGame");
         } else {
