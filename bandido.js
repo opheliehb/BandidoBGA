@@ -358,7 +358,7 @@ define([
 
                 this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
             },
-            
+
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
                 if (cards.length === 0) {
@@ -449,9 +449,19 @@ define([
                 console.log(notif);
 
                 if (this.isCurrentPlayerActive()) {
-                    this.playerHand.removeFromStock(
-                        notif.args.card_type,
-                        this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation));
+                    possibleMoveDivId = this.getPossibleMoveId(notif.args.x, notif.args.y, notif.args.rotation)
+
+                    if (dojo.byId(possibleMoveDivId) != null) {
+                        this.playerHand.removeFromStock(
+                            notif.args.card_type,
+                            possibleMoveDivId);
+                    }
+                    else {
+                        // When replaying the game, we don't have the possible moves div
+                        // so we just remove the card from the player hand
+                        this.playerHand.removeFromStock(notif.args.card_type);
+                    }
+
 
                     this.card = null;
                     dojo.query('.possiblemove').forEach(dojo.destroy);
