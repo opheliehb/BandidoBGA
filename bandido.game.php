@@ -469,7 +469,7 @@ class Bandido extends Table
         $this->notifyPlayer($player_id, "changeHand", "", array('newHand' => $new_player_hand));
         $this->notifyAllPlayers(
             "playerChangedHand",
-            clienttranslate('${player_name} could not play and changer their hand'),
+            clienttranslate('${player_name} could not play and changed their hand'),
             array('player_name' => $this->getActivePlayerName())
         );
 
