@@ -78,6 +78,11 @@
     background-image: url('img/cards.jpg'); 
 }
 
+.lastcardplayed {
+    box-sizing: border-box;
+    border: 3px solid red;
+}
+
 .possiblemove {
     position: absolute;
     width: 200px;

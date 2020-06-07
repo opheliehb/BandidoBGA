@@ -202,14 +202,20 @@ define([
             /*** Creates a div corresponding to the card indicated by card_id,
              * places it at position.
              */
-            placeCard: function (card_id, position) {
+            placeCard: function (card_id, position, update_last_played = false) {
                 var backgroundpos_y = card_id * this.cardheight;
                 dojo.place(
                     this.format_block('jstpl_cardontable', { id: card_id, y: backgroundpos_y }),
                     $('map_scrollable'));
 
+
                 var divid = 'cardontable_' + card_id;
                 this.placeCardDiv(divid, position)
+
+                if (update_last_played) {
+                    dojo.forEach(dojo.query('.lastcardplayed'), function (div) { dojo.removeClass(div, "lastcardplayed") });
+                    dojo.addClass(divid, "lastcardplayed");
+                }
             },
 
             /*** Moves divid on the position {position.x, position.y}, rotated by (position.rotation) degrees
@@ -469,7 +475,8 @@ define([
                 }
 
                 this.placeCard(notif.args.card_type,
-                    { x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation });
+                    { x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation },
+                    true);
             },
 
             notif_addCardToHand: function (notif) {
