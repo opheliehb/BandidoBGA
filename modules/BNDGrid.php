@@ -199,6 +199,19 @@ class BNDGrid extends APP_DbObject
         return $playable_locations;
     }
 
+    public static function getEscapeCount()
+    {
+        $escape_count = 0;
+        $grid = self::getGrid();
+        foreach ($grid as $x => $gridXCoord) {
+            foreach ($gridXCoord as $y => $dbsubcard) {
+                $subcard = BNDSubcard::getSubcard($dbsubcard);
+                $escape_count += $subcard->getEscapeCount();
+            }
+        }
+        return $escape_count;
+    }
+
 
     public static function testExitMatchesNeighbors($current_card_exit, $neighbor_card_exit)
     {

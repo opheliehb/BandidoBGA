@@ -91,6 +91,12 @@ $stats_type = array(
             "type" => "float"
         ),
 
+        "escape_count" => array(
+            "id" => 16,
+            "name" => totranslate("Number of exits left open"),
+            "type" => "int"
+        ),
+
     ),
 
     // Statistics existing for each player

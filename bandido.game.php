@@ -262,6 +262,7 @@ class Bandido extends Table
     {
         $this->initStat("table", "number_of_turns", 0);
         $this->initStat("table", "cards_in_deck", 0);
+        $this->initStat("table", "escape_count", -1);
         $this->initStat("table", "longest_path", 0);
         $this->initStat("table", "exits_opened", 0);
         $this->initStat("table", "exits_closed", 0);
@@ -309,6 +310,8 @@ class Bandido extends Table
         /** Get cards left in deck */
         $cards_in_deck = $this->cards->countCardInLocation('deck');
         $this->setStat($cards_in_deck, "cards_in_deck");
+
+        $this->setStat(BNDGrid::getEscapeCount(), "escape_count");
     }
 
     function getPossibleMoves($player_id)

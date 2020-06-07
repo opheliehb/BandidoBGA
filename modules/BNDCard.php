@@ -68,6 +68,23 @@ class BNDSubcard
         BNDExitMap::set($this->_card_id, $this->getExitsWithoutRotation());
     }
 
+    function getEscapeCount() {
+        $escape_count = 0;
+        if ($this->_left == -1) {
+            $escape_count++;
+        }
+        if ($this->_right == -1) {
+            $escape_count++;
+        }
+        if ($this->_top == -1) {
+            $escape_count++;
+        }
+        if ($this->_bottom == -1) {
+            $escape_count++;
+        }
+        return $escape_count;
+    }
+
     function getExitsWithRotation($exits) {
         switch ($this->_rotation) {
             case 0:
