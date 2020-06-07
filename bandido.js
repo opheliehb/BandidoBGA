@@ -391,7 +391,7 @@ define([
             onChangeHand: function (evt) {
                 dojo.stopEvent(evt);
 
-                this.ajaxcall("/bandido/bandido/changeHand.html", {}, this, function (result) { });
+                this.ajaxcall("/bandido/bandido/changeHand.html", {lock: true}, this, function (result) { });
             },
 
             onSelectCard: function (control_name, item_id) {
@@ -455,6 +455,7 @@ define([
                             y: y,
                             rotation: rotation,
                             cardId: card.id,
+                            lock: true
                         }, this, function (result) { });
                     }
                 }
@@ -463,7 +464,7 @@ define([
             onStopGame: function (evt) {
                 dojo.stopEvent(evt);
 
-                this.ajaxcall("/bandido/bandido/stopGame.html", {}, this, function (result) { });
+                this.ajaxcall("/bandido/bandido/stopGame.html", {lock: true}, this, function (result) { });
             },
 
             ///////////////////////////////////////////////////
