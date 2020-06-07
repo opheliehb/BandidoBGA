@@ -123,18 +123,36 @@
 }
 /** End arrow classes */
 
+
 /** Begin Scrollmap classes **/
+.map_zoom {
+    background-image: url('img/zoomicons.png');
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+}
+
+.map_zoom_in {
+    background-position:-36px 0px;
+}
+
+.map_zoom_out {
+    background-position:0px 0px;
+}
+
 #map_container {
     position: relative;
     width: 100%;
     height: 400px;
     overflow: hidden;
 }
+
 #map_scrollable, #map_scrollable_oversurface {
     position: absolute;
     top: 205px;
     left:  315px;
 }
+
 #map_surface {
     position: absolute;
     top: 0px;
@@ -143,6 +161,7 @@
     height: 100%;
     cursor: move;
 }
+
 #map_footer {
     text-align: center;
 }

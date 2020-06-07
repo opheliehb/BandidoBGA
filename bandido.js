@@ -33,6 +33,7 @@ define([
                 this.cardheight = 100;
                 this.cardRotations = {};
                 this.card = null;
+                this.zoom = 1;
 
                 dojo.require("dojo.NodeList-traverse");
             },
@@ -83,8 +84,7 @@ define([
 
                 this.possibleMoves = this.getSortedPossibleMoves(this.gamedatas.possibleMoves);
 
-                if(this.gamedatas.gameUnwinnable != 0)
-                {
+                if (this.gamedatas.gameUnwinnable != 0) {
                     this.addActionButton('Abandon game', _('Abandon game'), 'onStopGame');
                 }
 
@@ -96,6 +96,9 @@ define([
                     $('map_scrollable_oversurface'));
                 this.scrollmap.setupOnScreenArrows(150);
 
+
+                dojo.connect($('zoomin'), 'onclick', this, 'onClickMapZoomIn');
+                dojo.connect($('zoomout'), 'onclick', this, 'onClickMapZoomOut');
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
                 dojo.connect($('moveleft'), 'onclick', this, 'onMoveLeft');
                 dojo.connect($('moveright'), 'onclick', this, 'onMoveRight');
@@ -150,6 +153,23 @@ define([
             },
 
             /** Begin scrollmap handlers */
+
+            onClickMapZoomIn: function (evt) {
+                evt.preventDefault();
+                this.changeMapZoom(0.2);
+            },
+            onClickMapZoomOut: function (evt) {
+                evt.preventDefault();
+                this.changeMapZoom(-0.2);
+            },
+            changeMapZoom: function (diff) {
+                if (this.zoom > 0.4 && this.zoom < 2) {
+                    this.zoom = this.zoom + diff;
+                    dojo.style($('map_scrollable'), 'transform', 'scale(' + this.zoom + ')');
+                    dojo.style($('map_scrollable_oversurface'), 'transform', 'scale(' + this.zoom + ')');
+                }
+            },
+
             onMoveTop: function (evt) {
                 console.log("onMoveTop");
                 evt.preventDefault();
@@ -178,10 +198,7 @@ define([
                 dojo.style($('map_container'), 'height', (cur_h + 300) + 'px');
             },
             /** End scrollmap handlers */
-
-            // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
-            //                        action status bar (ie: the HTML links in the status bar).
-            //        
+  
             onUpdateActionButtons: function (stateName, args) {
                 console.log('onUpdateActionButtons: ' + stateName);
 
@@ -191,8 +208,7 @@ define([
                             if (args.possibleMoves.length == 0) {
                                 this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
                             }
-                            if(args.gameUnwinnable != 0)
-                            {
+                            if (args.gameUnwinnable != 0) {
                                 this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
                             }
                             break;
