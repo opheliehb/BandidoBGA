@@ -284,10 +284,10 @@ class Bandido extends Table
             $player_id = $player['player_id'];
             $exits_opened_player = $this->getStat("exits_opened", $player_id);
             $exits_closed_player = $this->getStat("exits_closed", $player_id);
-            if ($exits_opened_player != 0) {
-                $open_close_ratio = ((float) $exits_closed_player / $exits_opened_player) * 100;
+            if (($exits_opened_player + $exits_closed_player) != 0) {
+                $open_close_ratio = ((float) $exits_closed_player / ($exits_opened_player + $exits_closed_player)) * 100;
             } else {
-                $open_close_ratio = 100;
+                $open_close_ratio = 50;
             }
             $this->setStat($open_close_ratio, "open_close_ratio", $player_id);
 
@@ -297,10 +297,10 @@ class Bandido extends Table
 
         $this->setStat($exits_opened, "exits_opened");
         $this->setStat($exits_closed, "exits_closed");
-        if ($exits_opened != 0) {
-            $open_close_ratio = ((float) $exits_closed / $exits_opened) * 100;
+        if (($exits_opened + $exits_closed) != 0) {
+            $open_close_ratio = ((float) $exits_closed / ($exits_opened + $exits_closed)) * 100;
         } else {
-            $open_close_ratio = 100;
+            $open_close_ratio = 50;
         }
         $this->setStat($open_close_ratio, "open_close_ratio");
 
