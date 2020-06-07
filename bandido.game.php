@@ -35,7 +35,8 @@ class Bandido extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            "supercardId" => 100
+            "supercardId" => 100,
+            "game_unwinnable" => 101
         ));
 
         $this->cards = self::getNew("module.common.deck");
@@ -91,7 +92,7 @@ class Bandido extends Table
         $this->dealStartingCards();
 
         BNDGrid::initializeGrid(self::getGameStateValue('supercardId'));
-
+        self::setGameStateInitialValue("game_unwinnable", 0 );
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
@@ -127,7 +128,7 @@ class Bandido extends Table
         $result['supercard_id'] = self::getGameStateValue('supercardId');
 
         $result['grid'] = BNDGrid::getGrid();
-
+        $result['gameUnwinnable'] = self::getGameStateValue('game_unwinnable');
 
         $active_player_id = $this->getActivePlayerId();
         if ($current_player_id == $active_player_id) {
@@ -410,7 +411,11 @@ class Bandido extends Table
             throw new feException("Invalid card placement!");
         }
 
-        list($exits_opened, $exits_closed) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation, $grid);
+        list($exits_opened, $exits_closed, $created_isolated_square) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation, $grid);
+        if($created_isolated_square)
+        {
+            self::setGameStateValue("game_unwinnable", 1);
+        }
 
         /** Handle open/close exits stats
          * exits opened = number of exits added by the player
@@ -476,6 +481,21 @@ class Bandido extends Table
         $this->gamestate->nextState("nextPlayer");
     }
 
+    function stopGame()
+    {
+        // Check that action is possible for player
+        self::checkAction('stopGame');
+
+        if(self::getGameStateValue("game_unwinnable") == 0)
+        {
+            // Can't abandon if game is still winnable !
+            return;
+        }
+
+        $this->computeFinalStatistics();
+        $this->gamestate->nextState("stopGame");
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state arguments
@@ -490,12 +510,20 @@ class Bandido extends Table
     function argPossibleMoves()
     {
         $possible_moves = $this->getPossibleMoves($this->getActivePlayerId());
+        $game_unwinnable = self::getGameStateValue('game_unwinnable');
         $action = "play a card";
         if (empty($possible_moves)) {
             $action = "change your hand";
         }
+
+        if($game_unwinnable != 0)
+        {
+            $action = $action." or you can stop the game because it is now unwinnnable (isolated square)";
+        }
+
         return array(
             'possibleMoves' => $this->getPossibleMoves($this->getActivePlayerId()),
+            'gameUnwinnable' => $game_unwinnable,
             'action' => $action
         );
     }

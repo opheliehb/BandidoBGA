@@ -56,4 +56,11 @@ class action_bandido extends APP_GameAction
     self::ajaxResponse();
   }
 
+  public function stopGame()
+  {
+    self::setAjaxMode();
+    $this->game->stopGame();
+    self::ajaxResponse();
+  }
+
 }

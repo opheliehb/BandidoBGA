@@ -47,23 +47,28 @@ class BNDGrid extends APP_DbObject
     {
         switch ($rotation) {
             case 0:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x + 1, $y, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0,  $created_isolated_square_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1,  $created_isolated_square_1) = self::placeSubcard($id . "_1", $x + 1, $y, $rotation, $grid);
                 break;
             case 90:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x, $y + 1, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0,  $created_isolated_square_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1,  $created_isolated_square_1) = self::placeSubcard($id . "_1", $x, $y + 1, $rotation, $grid);
                 break;
             case 180:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x - 1, $y, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0,  $created_isolated_square_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1,  $created_isolated_square_1) = self::placeSubcard($id . "_1", $x - 1, $y, $rotation, $grid);
                 break;
             case 270:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x, $y - 1, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0,  $created_isolated_square_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1,  $created_isolated_square_1) = self::placeSubcard($id . "_1", $x, $y - 1, $rotation, $grid);
                 break;
         }
-        return array($exits_opened_0 + $exits_opened_1, $exits_closed_0 + $exits_closed_1);
+
+        return array(
+            $exits_opened_0 + $exits_opened_1,
+            $exits_closed_0 + $exits_closed_1,
+            $created_isolated_square_0 || $created_isolated_square_1
+        );
     }
 
     /** Place a subcard on the grid by inserting it in the DB.
@@ -126,7 +131,40 @@ class BNDGrid extends APP_DbObject
         );
         self::DbQuery($sql);
 
-        return array($exits_opened, $exits_closed);
+        $grid[$x][$y]["subcard_id"] = $id;
+        $grid[$x][$y]["rotation"] = $rotation;
+        $created_isolated_square = (self::isIsolatedSquare($x + 1, $y, $grid)
+            || self::isIsolatedSquare($x - 1, $y, $grid)
+            || self::isIsolatedSquare($x, $y + 1, $grid)
+            || self::isIsolatedSquare($x, $y - 1, $grid));
+
+        return array($exits_opened, $exits_closed, $created_isolated_square);
+    }
+
+    public static function isIsolatedSquare($x, $y, $grid)
+    {
+        $is_isolated_square = false;
+        // if the square is surrounded by cards
+        if (
+            $grid[$x - 1][$y]["subcard_id"] != null
+            && $grid[$x + 1][$y]["subcard_id"] != null
+            && $grid[$x][$y - 1]["subcard_id"] != null
+            && $grid[$x][$y + 1]["subcard_id"] != null
+        ) {
+            $left_subcard = BNDSubcard::getSubcard($grid[$x - 1][$y]);
+            $right_subcard = BNDSubcard::getSubcard($grid[$x + 1][$y]);
+            $top_subcard = BNDSubcard::getSubcard($grid[$x][$y - 1]);
+            $bottom_subcard = BNDSubcard::getSubcard($grid[$x][$y + 1]);
+
+            // If there is an exit leading to the square, 
+            // it is isolated and game is unwinnable
+            $is_isolated_square = ($left_subcard->_right == -1
+                || $right_subcard->_left == -1
+                || $top_subcard->_bottom == -1
+                || $bottom_subcard->_top == -1);
+        }
+
+        return $is_isolated_square;
     }
 
     public static function getPlayableLocationsFromCard($subcard, $x, $y)

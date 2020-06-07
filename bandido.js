@@ -83,6 +83,11 @@ define([
 
                 this.possibleMoves = this.getSortedPossibleMoves(this.gamedatas.possibleMoves);
 
+                if(this.gamedatas.gameUnwinnable != 0)
+                {
+                    this.addActionButton('Abandon game', _('Abandon game'), 'onStopGame');
+                }
+
                 /** Begin scrollmap setup */
                 this.scrollmap.create(
                     $('map_container'),
@@ -185,6 +190,10 @@ define([
                         case 'playerTurn':
                             if (args.possibleMoves.length == 0) {
                                 this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
+                            }
+                            if(args.gameUnwinnable != 0)
+                            {
+                                this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
                             }
                             break;
                     }
@@ -429,6 +438,12 @@ define([
                         }, this, function (result) { });
                     }
                 }
+            },
+
+            onStopGame: function (evt) {
+                dojo.stopEvent(evt);
+
+                this.ajaxcall("/bandido/bandido/stopGame.html", {}, this, function (result) { });
             },
 
             ///////////////////////////////////////////////////
