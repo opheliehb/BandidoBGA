@@ -28,8 +28,7 @@
 <div>
 
     <div class="row">
-        <div id="deck" class="deck">
-        </div>
+        <div id="deck" class="deck"></div>
 
             <div id="playerhand" class="playerhand">
             </div>

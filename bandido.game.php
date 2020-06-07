@@ -129,6 +129,7 @@ class Bandido extends Table
 
         $result['grid'] = BNDGrid::getGrid();
         $result['gameUnwinnable'] = self::getGameStateValue('game_unwinnable');
+        $result['deckCount'] = $this->cards->countCardInLocation("deck");
 
         $active_player_id = $this->getActivePlayerId();
         if ($current_player_id == $active_player_id) {
@@ -438,6 +439,11 @@ class Bandido extends Table
         // New card as been placed, delete all previous player move as they can change
         self::DbQuery("DELETE FROM playermoves");
 
+        // Pick a new card for the player
+        $card_drawn = $this->cards->pickCard('deck', $player_id);
+
+        $deckCount = $this->cards->countCardInLocation("deck");
+
         // Notify all players about the card played
         self::notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays a card'), array(
             'player_id' => $player_id,
@@ -445,11 +451,9 @@ class Bandido extends Table
             'card_type' => $card['type_arg'],
             'x' => $x,
             'y' => $y,
-            'rotation' => $rotation
+            'rotation' => $rotation,
+            'deckCount' => $deckCount,
         ));
-
-        // Pick a new card for the player
-        $card_drawn = $this->cards->pickCard('deck', $player_id);
         // Notify active player about the card he's redrawn
         self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $card_drawn));
 

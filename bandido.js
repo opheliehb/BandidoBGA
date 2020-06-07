@@ -54,11 +54,6 @@ define([
             setup: function (gamedatas) {
                 console.log("Starting game setup");
 
-                // Setting up player boards
-                for (var player_id in gamedatas.players) {
-                    var player = gamedatas.players[player_id];
-                }
-
                 this.playerHand = new ebg.stock();
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
                 this.playerHand.image_items_per_row = 1;
@@ -87,6 +82,8 @@ define([
                 if (this.gamedatas.gameUnwinnable != 0) {
                     this.addActionButton('Abandon game', _('Abandon game'), 'onStopGame');
                 }
+
+                this.setDeckLabel(this.gamedatas.deckCount);
 
                 /** Begin scrollmap setup */
                 this.scrollmap.create(
@@ -198,7 +195,7 @@ define([
                 dojo.style($('map_container'), 'height', (cur_h + 300) + 'px');
             },
             /** End scrollmap handlers */
-  
+
             onUpdateActionButtons: function (stateName, args) {
                 console.log('onUpdateActionButtons: ' + stateName);
 
@@ -218,6 +215,13 @@ define([
 
             ///////////////////////////////////////////////////
             //// Utility methods
+
+            setDeckLabel: function (deckCount) {
+                var deckLabel = dojo.string.substitute(_("${deckCount} cards left"), {
+                    deckCount: deckCount
+                });
+                dojo.byId("deck").textContent = deckLabel;
+            },
 
             /*** get the div id of a possible move in (x,y) rotated by (rotation) degrees */
             getPossibleMoveId: function (x, y, rotation) {
@@ -504,6 +508,8 @@ define([
                     dojo.query('.possiblemove').forEach(dojo.destroy);
                     dojo.query('.manipulation-arrow').forEach(dojo.destroy);
                 }
+
+                this.setDeckLabel(notif.args.deckCount);
 
                 this.placeCard(notif.args.card_type,
                     { x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation },
