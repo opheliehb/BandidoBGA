@@ -231,7 +231,7 @@ define([
             /*** Creates a div corresponding to the card indicated by card_id,
              * places it at position.
              */
-            placeCard: function (card_id, position, update_last_played = false) {
+            placeCard: function (card_id, position, update_last_played) {
                 var backgroundpos_y = card_id * this.cardheight;
                 dojo.place(
                     this.format_block('jstpl_cardontable', { id: card_id, y: backgroundpos_y }),
@@ -286,7 +286,7 @@ define([
                             continue;
                         }
                         var card_id = subCard.subcard_id.split("_")[0];
-                        this.placeCard(card_id, { x: subCard.x, y: subCard.y, rotation: subCard.rotation });
+                        this.placeCard(card_id, { x: subCard.x, y: subCard.y, rotation: subCard.rotation }, false);
                     }
                 }
             },
