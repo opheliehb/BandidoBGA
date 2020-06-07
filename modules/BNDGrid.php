@@ -144,9 +144,10 @@ class BNDGrid extends APP_DbObject
     public static function isIsolatedSquare($x, $y, $grid)
     {
         $is_isolated_square = false;
-        // if the square is surrounded by cards
-        if (
-            $grid[$x - 1][$y]["subcard_id"] != null
+
+        // if the square is empty and surrounded by cards
+        if ($grid[$x][$y]["subcard_id"] == null
+            && $grid[$x - 1][$y]["subcard_id"] != null
             && $grid[$x + 1][$y]["subcard_id"] != null
             && $grid[$x][$y - 1]["subcard_id"] != null
             && $grid[$x][$y + 1]["subcard_id"] != null
