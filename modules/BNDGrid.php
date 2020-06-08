@@ -24,18 +24,22 @@ class BNDGrid extends APP_DbObject
 
     public static function initializeGrid($supercard_id)
     {
+        $sql = "INSERT INTO grid (x, y) VALUES ";
         // Create an empty 138*138 grid in database
         for ($x = -69; $x <= 69; $x++) {
             for ($y = -69; $y <= 69; $y++) {
-                $sql = sprintf(
-                    "INSERT INTO grid (x, y) VALUES ( '%d', '%d' )",
+                $newSquare = sprintf(
+                    " ( '%d', '%d' ),",
                     $x,
                     $y
                 );
-                self::DbQuery($sql);
+                $sql = $sql.$newSquare;
             }
         }
 
+        $sqlTrimmed = trim($sql, ',');
+        self::DbQuery($sqlTrimmed);
+        
         $grid = BNDGrid::getFullGrid();
         self::placeCard($supercard_id, 0, 0, 0, $grid);
     }
