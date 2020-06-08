@@ -1,11 +1,11 @@
 <?php
 
 /**
-         *------
-         * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * Bandido implementation : © Ophélie Haurou-Béjottes <ophelie.hb@gmail.com> & Julien Plantier <julplantier@free.fr>
- * 
- * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ *------
+ * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+         * Bandido implementation : © Ophélie Haurou-Béjottes <ophelie.hb@gmail.com> & Julien Plantier <julplantier@free.fr>
+         * 
+         * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  * 
@@ -35,8 +35,9 @@ class Bandido extends Table
         parent::__construct();
 
         self::initGameStateLabels(array(
-            "supercardId" => 100,
-            "game_unwinnable" => 101
+            "game_unwinnable" => 10,
+            "covid_variant" => 100,
+            "supercard_id" => 101
         ));
 
         $this->cards = self::getNew("module.common.deck");
@@ -44,6 +45,8 @@ class Bandido extends Table
 
         $this->game_wins = false;
         $this->players_win = false;
+        $this->deck_size = 0;
+        $this->supercard_id = 0;
     }
 
     protected function getGameName()
@@ -82,17 +85,25 @@ class Bandido extends Table
 
         $this->initGameStatistics();
 
-        BNDExitMap::initialize($this->initial_card_exits);
+        if (self::getGameStateValue('covid_variant') == 1) {
+            $this->deck_size = 69;
+            $this->supercard_id = self::getGameStateValue('supercard_id');
+            BNDExitMap::initialize($this->initial_card_exits);
+        } else {
+            $this->deck_size = 32;
+            $this->supercard_id = 32;
+            BNDExitMap::initialize($this->covid_initial_card_exits);
+        }
 
-        for ($value = 0; $value < 69; $value++) {
+        for ($value = 0; $value < $this->deck_size; $value++) {
             $cards[] = array('type' => 'card', 'type_arg' => $value, 'nbr' => 1);
         }
 
         $this->cards->createCards($cards, 'deck');
         $this->dealStartingCards();
 
-        BNDGrid::initializeGrid(self::getGameStateValue('supercardId'));
-        self::setGameStateInitialValue("game_unwinnable", 0 );
+        BNDGrid::initializeGrid($this->supercard_id);
+        self::setGameStateInitialValue("game_unwinnable", 0);
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
@@ -113,6 +124,7 @@ class Bandido extends Table
     protected function getAllDatas()
     {
         $result = array();
+        $result['covid'] = (self::getGameStateValue('covid_variant') == 2);
 
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
@@ -124,8 +136,7 @@ class Bandido extends Table
         // Cards in player hand      
         $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
 
-        // supercard id
-        $result['supercard_id'] = self::getGameStateValue('supercardId');
+        $result['supercard_id'] = $this->supercard_id;
 
         $result['grid'] = BNDGrid::getGrid();
         $result['gameUnwinnable'] = self::getGameStateValue('game_unwinnable');
@@ -229,8 +240,7 @@ class Bandido extends Table
     {
         if ($this->players_win) {
             self::DbQuery("UPDATE player SET player_score=1");
-        }
-        else if ($this->game_wins) {
+        } else if ($this->game_wins) {
             if (count(self::loadPlayersBasicInfos()) == 1) {
                 /** to lose a solo game, your score must be negative or else it logs a victory */
                 self::DbQuery("UPDATE player SET player_score=-1");
@@ -245,7 +255,7 @@ class Bandido extends Table
         }
 
         $this->computeScore();
-        
+
         return true;
     }
 
@@ -420,8 +430,7 @@ class Bandido extends Table
         }
 
         list($exits_opened, $exits_closed, $created_isolated_square) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation, $grid);
-        if($created_isolated_square)
-        {
+        if ($created_isolated_square) {
             self::setGameStateValue("game_unwinnable", 1);
         }
 
@@ -475,8 +484,7 @@ class Bandido extends Table
         $player_id = $this->getActivePlayerId();
 
         $possible_moves = $this->getPossibleMoves($player_id);
-        if(!empty($possible_moves))
-        {
+        if (!empty($possible_moves)) {
             // Can't change hand if there is a possible move !
             return;
         }
@@ -504,8 +512,7 @@ class Bandido extends Table
         // Check that action is possible for player
         self::checkAction('stopGame');
 
-        if(self::getGameStateValue("game_unwinnable") == 0)
-        {
+        if (self::getGameStateValue("game_unwinnable") == 0) {
             // Can't abandon if game is still winnable !
             return;
         }
@@ -536,9 +543,8 @@ class Bandido extends Table
             $action = "change your hand";
         }
 
-        if($game_unwinnable != 0)
-        {
-            $action = $action." or you can stop the game because it is now unwinnnable (isolated square)";
+        if ($game_unwinnable != 0) {
+            $action = $action . " or you can stop the game because it is now unwinnnable (isolated square)";
         }
 
         return array(

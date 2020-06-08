@@ -27,6 +27,7 @@ define([
         return declare("bgagame.bandido", ebg.core.gamegui, {
             constructor: function () {
                 console.log('bandido constructor');
+                this.covid_variant = false;
 
                 this.scrollmap = new ebg.scrollmap();
                 this.cardwidth = 200;
@@ -59,10 +60,19 @@ define([
                 this.playerHand.image_items_per_row = 1;
 
                 // Create cards types:
-                for (var row = 0; row < 69; row++) {
-                    this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row);
+                this.covid_variant = this.gamedatas.covid;
+                if (this.covid_variant == true) {
+                    for (var row = 0; row < 32; row++) {
+                        this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards_covid.jpg', row);
+                    }
+                    dojo.addClass('deck', "deck_covid");
                 }
-
+                else {
+                    for (var row = 0; row < 69; row++) {
+                        this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row);
+                    }
+                    dojo.addClass('deck', "deck_standard");
+                }
                 // Cards in player's hand
                 for (var i in this.gamedatas.hand) {
                     var card = this.gamedatas.hand[i];
@@ -161,7 +171,7 @@ define([
             },
             changeMapZoom: function (diff) {
                 newZoom = this.zoom + diff;
-                
+
                 // Keep zoom in the [0.2, 2] range
                 this.zoom = newZoom <= 0.2 ? 0.2 : newZoom >= 2 ? 2 : newZoom;
 
@@ -239,10 +249,17 @@ define([
                     this.format_block('jstpl_cardontable', { id: card_id, y: backgroundpos_y }),
                     $('map_scrollable'));
 
-
                 var divid = 'cardontable_' + card_id;
+                if (this.covid_variant) {
+                    dojo.addClass(divid, "cardontable_covid");
+                }
+                else {
+                    dojo.addClass(divid, "cardontable_standard");
+                }
+
                 this.placeCardDiv(divid, position)
 
+                /** place red square around last played card */
                 if (update_last_played) {
                     dojo.forEach(dojo.query('.lastcardplayed'), function (div) { dojo.removeClass(div, "lastcardplayed") });
                     dojo.addClass(divid, "lastcardplayed");
@@ -317,13 +334,21 @@ define([
                     var x = possibleMove[0];
                     var y = possibleMove[1];
 
+                    var divid = this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]);
                     dojo.place(
-                        "<div id=" + this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]) +
+                        "<div id=" + divid +
                         " class=possiblemove style=\"background-position:0px -" +
                         this.card.type * this.cardheight + "px\"></div>",
                         $('map_scrollable_oversurface')
                     );
-                    this.placeCardDiv(this.getPossibleMoveId(x, y, this.cardRotations[this.card.id]),
+
+                    if (this.covid_variant) {
+                        dojo.addClass(divid, 'possiblemove_covid');
+                    } else {
+                        dojo.addClass(divid, 'possiblemove_standard');
+                    }
+
+                    this.placeCardDiv(divid,
                         { x: x, y: y, rotation: this.cardRotations[this.card.id] });
                 }
 
@@ -393,7 +418,7 @@ define([
             onChangeHand: function (evt) {
                 dojo.stopEvent(evt);
 
-                this.ajaxcall("/bandido/bandido/changeHand.html", {lock: true}, this, function (result) { });
+                this.ajaxcall("/bandido/bandido/changeHand.html", { lock: true }, this, function (result) { });
             },
 
             onSelectCard: function (control_name, item_id) {
@@ -466,7 +491,7 @@ define([
             onStopGame: function (evt) {
                 dojo.stopEvent(evt);
 
-                this.ajaxcall("/bandido/bandido/stopGame.html", {lock: true}, this, function (result) { });
+                this.ajaxcall("/bandido/bandido/stopGame.html", { lock: true }, this, function (result) { });
             },
 
             ///////////////////////////////////////////////////
