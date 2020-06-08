@@ -475,6 +475,13 @@ class Bandido extends Table
 
         $player_id = $this->getActivePlayerId();
 
+        $possible_moves = $this->getPossibleMoves($player_id);
+        if(!empty($possible_moves))
+        {
+            // Can't change hand if there is a possible move !
+            return;
+        }
+
         // Move all cards from the player's hand to the bottom of the deck
         $player_hand = $this->cards->getPlayerHand($player_id);
         foreach ($player_hand as $card) {
