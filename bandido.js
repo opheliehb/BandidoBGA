@@ -160,11 +160,13 @@ define([
                 this.changeMapZoom(-0.2);
             },
             changeMapZoom: function (diff) {
-                if (this.zoom > 0.4 && this.zoom < 2) {
-                    this.zoom = this.zoom + diff;
-                    dojo.style($('map_scrollable'), 'transform', 'scale(' + this.zoom + ')');
-                    dojo.style($('map_scrollable_oversurface'), 'transform', 'scale(' + this.zoom + ')');
-                }
+                newZoom = this.zoom + diff;
+                
+                // Keep zoom in the [0.2, 2] range
+                this.zoom = newZoom <= 0.2 ? 0.2 : newZoom >= 2 ? 2 : newZoom;
+
+                dojo.style($('map_scrollable'), 'transform', 'scale(' + this.zoom + ')');
+                dojo.style($('map_scrollable_oversurface'), 'transform', 'scale(' + this.zoom + ')');
             },
 
             onMoveTop: function (evt) {
