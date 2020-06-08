@@ -47,8 +47,8 @@ class BNDGrid extends APP_DbObject
     {
         switch ($rotation) {
             case 0:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x + 1, $y, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0, $grid) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1, $grid) = self::placeSubcard($id . "_1", $x + 1, $y, $rotation, $grid);
                 $created_isolated_square = (
                     self::isIsolatedSquare($x - 1, $y, $grid)
                     || self::isIsolatedSquare($x + 2, $y, $grid)
@@ -58,8 +58,8 @@ class BNDGrid extends APP_DbObject
                     || self::isIsolatedSquare($x + 1, $y + 1, $grid));
                 break;
             case 90:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x, $y + 1, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0, $grid) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1, $grid) = self::placeSubcard($id . "_1", $x, $y + 1, $rotation, $grid);
                 $created_isolated_square = (
                     self::isIsolatedSquare($x, $y - 1, $grid)
                     || self::isIsolatedSquare($x, $y + 2, $grid)
@@ -69,8 +69,8 @@ class BNDGrid extends APP_DbObject
                     || self::isIsolatedSquare($x + 1, $y + 1, $grid));
                 break;
             case 180:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x - 1, $y, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0, $grid) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1, $grid) = self::placeSubcard($id . "_1", $x - 1, $y, $rotation, $grid);
                 $created_isolated_square = (
                     self::isIsolatedSquare($x + 1, $y, $grid)
                     || self::isIsolatedSquare($x - 2, $y, $grid)
@@ -80,8 +80,8 @@ class BNDGrid extends APP_DbObject
                     || self::isIsolatedSquare($x - 1, $y + 1, $grid));
                 break;
             case 270:
-                list($exits_opened_0, $exits_closed_0) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
-                list($exits_opened_1, $exits_closed_1) = self::placeSubcard($id . "_1", $x, $y - 1, $rotation, $grid);
+                list($exits_opened_0, $exits_closed_0, $grid) = self::placeSubcard($id . "_0", $x, $y, $rotation, $grid);
+                list($exits_opened_1, $exits_closed_1, $grid) = self::placeSubcard($id . "_1", $x, $y - 1, $rotation, $grid);
                 $created_isolated_square = (
                     self::isIsolatedSquare($x, $y + 1, $grid)
                     || self::isIsolatedSquare($x, $y - 2, $grid)
@@ -162,7 +162,7 @@ class BNDGrid extends APP_DbObject
         $grid[$x][$y]["subcard_id"] = $id;
         $grid[$x][$y]["rotation"] = $rotation;
 
-        return array($exits_opened, $exits_closed);
+        return array($exits_opened, $exits_closed, $grid);
     }
 
     public static function isIsolatedSquare($x, $y, $grid)

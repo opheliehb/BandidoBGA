@@ -225,12 +225,8 @@ class Bandido extends Table
         return true;
     }
 
-    function gameHasEnded()
+    function computeScore()
     {
-        if (!$this->computeWinner()) {
-            return false;
-        }
-
         if ($this->players_win) {
             self::DbQuery("UPDATE player SET player_score=1");
         }
@@ -240,6 +236,15 @@ class Bandido extends Table
                 self::DbQuery("UPDATE player SET player_score=-1");
             }
         }
+    }
+
+    function gameHasEnded()
+    {
+        if (!$this->computeWinner()) {
+            return false;
+        }
+
+        $this->computeScore();
         
         return true;
     }
@@ -499,6 +504,8 @@ class Bandido extends Table
             return;
         }
 
+        $this->game_wins = true;
+        $this->computeScore();
         $this->computeFinalStatistics();
         $this->gamestate->nextState("stopGame");
     }
