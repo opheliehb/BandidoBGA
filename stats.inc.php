@@ -63,13 +63,7 @@ $stats_type = array(
             "name" => totranslate("Cards left in deck"),
             "type" => "int"
         ),
-
-        "longest_path" => array(
-            "id" => 12,
-            "name" => totranslate("Longest path from starting card"),
-            "type" => "int"
-        ),
-
+        
         "exits_opened" => array(
             "id" => 13,
             "name" => totranslate("Number of exits opened"),

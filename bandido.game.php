@@ -268,7 +268,6 @@ class Bandido extends Table
         $this->initStat("table", "number_of_turns", 0);
         $this->initStat("table", "cards_in_deck", 0);
         $this->initStat("table", "escape_count", -1);
-        $this->initStat("table", "longest_path", 0);
         $this->initStat("table", "exits_opened", 0);
         $this->initStat("table", "exits_closed", 0);
         $this->initStat("table", "open_close_ratio", 0);
