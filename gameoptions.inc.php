@@ -53,7 +53,7 @@ $game_options = array(
         'displaycondition' => array(
             array(
                 'type' => 'otheroption',
-                'id' => 102,
+                'id' => 100,
                 'value' => 1
             )
         )
