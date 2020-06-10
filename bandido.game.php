@@ -357,12 +357,12 @@ class Bandido extends Table
         }
         $playable_locations = BNDGrid::getPlayableLocations();
 
-        $grid = BNDGrid::getFullGrid();
+       BNDGrid::getGrid();
         foreach ($cards as $card) {
             foreach (array(0, 90, 180, 270) as $rotation) {
                 $temp_possible_moves = array();
                 foreach ($playable_locations as $location) {
-                    if (BNDGrid::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation, $grid)) {
+                    if (BNDGrid::cardCanBePlaced($card['type_arg'], $location[0], $location[1], $rotation)) {
                         array_push($temp_possible_moves, $location);
                     }
 
@@ -371,8 +371,7 @@ class Bandido extends Table
                         $card['type_arg'],
                         $other_location[0],
                         $other_location[1],
-                        $rotation,
-                        $grid
+                        $rotation
                     )) {
                         array_push($temp_possible_moves, $other_location);
                     }
@@ -422,14 +421,14 @@ class Bandido extends Table
 
         $player_id = $this->getActivePlayerId();
 
-        $grid = BNDGrid::getFullGrid();
+        BNDGrid::getGrid();
         $card = $this->cards->getCard($card_id);
 
-        if (!BNDGrid::cardCanBePlaced($card['type_arg'], $x, $y, $rotation, $grid)) {
+        if (!BNDGrid::cardCanBePlaced($card['type_arg'], $x, $y, $rotation)) {
             throw new feException("Invalid card placement!");
         }
 
-        list($exits_opened, $exits_closed, $created_isolated_square) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation, $grid);
+        list($exits_opened, $exits_closed, $created_isolated_square) = BNDGrid::placeCard($card['type_arg'], $x, $y, $rotation);
         if ($created_isolated_square) {
             self::setGameStateValue("game_unwinnable", 1);
         }
