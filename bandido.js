@@ -34,7 +34,7 @@ define([
                 this.cardheight = 100;
                 this.cardRotations = {};
                 this.card = null;
-                this.zoom = 1;
+                this.zoom = 0.6;
 
                 dojo.require("dojo.NodeList-traverse");
             },
@@ -111,6 +111,8 @@ define([
                 dojo.connect($('moveright'), 'onclick', this, 'onMoveRight');
                 dojo.connect($('movedown'), 'onclick', this, 'onMoveDown');
                 dojo.connect($('enlargedisplay'), 'onclick', this, 'onIncreaseDisplayHeight');
+
+                this.setMapZoom(this.zoom);
                 /** End scrollmap setup */
 
                 console.log("Ending game setup");
@@ -171,9 +173,12 @@ define([
             },
             changeMapZoom: function (diff) {
                 newZoom = this.zoom + diff;
-
+                this.setMapZoom(newZoom);
+            },
+            setMapZoom: function(zoom)
+            {
                 // Keep zoom in the [0.2, 2] range
-                this.zoom = newZoom <= 0.2 ? 0.2 : newZoom >= 2 ? 2 : newZoom;
+                this.zoom = zoom <= 0.2 ? 0.2 : zoom >= 2 ? 2 : zoom;
 
                 dojo.style($('map_scrollable'), 'transform', 'scale(' + this.zoom + ')');
                 dojo.style($('map_scrollable_oversurface'), 'transform', 'scale(' + this.zoom + ')');
