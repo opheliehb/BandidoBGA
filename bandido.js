@@ -216,17 +216,23 @@ define([
             onUpdateActionButtons: function (stateName, args) {
                 console.log('onUpdateActionButtons: ' + stateName);
 
-                if (this.isCurrentPlayerActive()) {
-                    switch (stateName) {
-                        case 'playerTurn':
-                            if (args.possibleMoves.length == 0) {
-                                this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
-                            }
-                            if (args.gameUnwinnable != 0) {
-                                this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
-                            }
-                            break;
-                    }
+                if (!this.isCurrentPlayerActive()) {
+                    return;
+                }
+                switch (stateName) {
+                    case 'playerTurn':
+                        if (args.possibleMoves.length == 0) {
+                            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute(
+                                _('${you} must change your hand'), { you: '${you}' });
+                            this.updatePageTitle();
+                            this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
+                        }
+                        if (args.gameUnwinnable != 0) {
+                            this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
+                            this.addTooltip('Stop game', "",
+                                _("The game is unwinnable (isolated square). Click here to stop it now."))
+                        }
+                        break;
                 }
             },
 

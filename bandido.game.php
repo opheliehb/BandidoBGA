@@ -537,19 +537,10 @@ class Bandido extends Table
     {
         $possible_moves = $this->getPossibleMoves($this->getActivePlayerId());
         $game_unwinnable = self::getGameStateValue('game_unwinnable');
-        $action = "play a card";
-        if (empty($possible_moves)) {
-            $action = "change your hand";
-        }
-
-        if ($game_unwinnable != 0) {
-            $action = $action . " or you can stop the game because it is now unwinnnable (isolated square)";
-        }
 
         return array(
-            'possibleMoves' => $this->getPossibleMoves($this->getActivePlayerId()),
-            'gameUnwinnable' => $game_unwinnable,
-            'action' => $action
+            'possibleMoves' => $possible_moves,
+            'gameUnwinnable' => $game_unwinnable
         );
     }
 
