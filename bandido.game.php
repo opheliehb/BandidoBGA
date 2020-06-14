@@ -131,10 +131,17 @@ class Bandido extends Table
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
-        $result['players'] = self::getCollectionFromDb($sql);
+        $players = self::getCollectionFromDb($sql);
+        $result['players'] = $players;
 
+        $handcounts = null;
+        foreach ($players as $player) {
+            $handcounts[$player['id']] = $this->cards->countCardInLocation("hand", $player['id']);
+        }
         // Cards in player hand      
         $result['hand'] = $this->cards->getCardsInLocation('hand', $current_player_id);
+        $result['handcounts'] = $handcounts;
+
 
         $result['supercard_id'] = $this->supercard_id;
 
@@ -468,6 +475,7 @@ class Bandido extends Table
             'y' => $y,
             'rotation' => $rotation,
             'deckCount' => $deckCount,
+            'handCount' => $this->cards->countCardInLocation("hand", $player_id),
         ));
         // Notify active player about the card he's redrawn
         self::notifyPlayer($player_id, "cardDrawn", "", array('cardDrawn' => $card_drawn));

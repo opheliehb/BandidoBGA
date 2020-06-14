@@ -68,6 +68,8 @@ define([
                     dojo.addClass('deck', "deck_covid");
                 }
                 else {
+                    // for (var row = 0; row < 69; row++) {
+                    // DEBUG
                     for (var row = 0; row < 69; row++) {
                         this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row);
                     }
@@ -81,6 +83,15 @@ define([
                 }
                 this.playerHand.setSelectionMode(1);
                 dojo.connect(this.playerHand, 'onChangeSelection', this, 'onSelectCard');
+
+                // Setting up player boards
+                for (var player_id in gamedatas.players) {
+                    var player = gamedatas.players[player_id];
+                    // Setting up players boards if needed
+                    var player_board_div = $('player_board_' + player_id);
+                    dojo.place(this.format_block('jstpl_player_board', player), player_board_div);
+                    dojo.byId("handcount_" + player_id).textContent = gamedatas.handcounts[player_id];
+                }
 
                 // Setup game notifications to handle (see "setupNotifications" method below)
                 this.setupNotifications();
@@ -175,8 +186,7 @@ define([
                 newZoom = this.zoom + diff;
                 this.setMapZoom(newZoom);
             },
-            setMapZoom: function(zoom)
-            {
+            setMapZoom: function (zoom) {
                 // Keep zoom in the [0.2, 2] range
                 this.zoom = zoom <= 0.2 ? 0.2 : zoom >= 2 ? 2 : zoom;
 
@@ -549,6 +559,7 @@ define([
                 }
 
                 this.setDeckLabel(notif.args.deckCount);
+                dojo.byId("handcount_" + notif.args.player_id).textContent = notif.args.handCount;
 
                 this.placeCard(notif.args.card_type,
                     { x: notif.args.x, y: notif.args.y, rotation: notif.args.rotation },

@@ -30,8 +30,8 @@
     <div class="row">
         <div id="deck" class="deck"></div>
 
-            <div id="playerhand" class="playerhand">
-            </div>
+        <div id="playerhand" class="playerhand">
+        </div>
 
     </div>
 
@@ -70,6 +70,10 @@
     var jstpl_rotateright = '<img src="{GAMETHEMEURL}img/rotate.svg" \
                                 class="manipulation-arrow rotate-right anticlockwise"\
                                 style="position: absolute; left: ${left}px;"/>';
+    var jstpl_player_board = '\<div class="cp_board">\
+                                    <img id="hand_${id}" src="{GAMETHEMEURL}img/hand.png" />\
+                                    <span id="handcount_${id}"></span>\
+                                </div>';
 </script>
 
 {OVERALL_GAME_FOOTER}
