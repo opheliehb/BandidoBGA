@@ -35,8 +35,6 @@
 
     </div>
 
-    <a id="zoomin" class="map_zoom map_zoom_in" href="#"></a>
-    <a id="zoomout" class="map_zoom map_zoom_out" href="#"></a>
     <div id="board" class="board">
         <div id="map_container">
             <div id="map_scrollable"></div>
@@ -44,6 +42,8 @@
             <div id="map_scrollable_oversurface">
                 <div id="supercard" class="card"></div>
             </div>
+            <a id="zoomin" class="map_zoom map_zoom_in" href="#"></a>
+            <a id="zoomout" class="map_zoom map_zoom_out" href="#"></a>
             <a id="movetop" class="map_arrow" href="#"></a>
             <a id="moveleft" class="map_arrow" href="#"></a>
             <a id="moveright" class="map_arrow" href="#"></a>

@@ -132,13 +132,17 @@
     width: 36px;
     height: 36px;
     display: inline-flex;
+    position: absolute;
+    top: 0px;
 }
 
 .map_zoom_in {
+    left: 0px;
     background-position:-36px 0px;
 }
 
 .map_zoom_out {
+    left: 36px;
     background-position:0px 0px;
 }
 
