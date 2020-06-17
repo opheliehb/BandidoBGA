@@ -40,14 +40,14 @@ $game_options = array(
     101 => array(
         'name' => totranslate('Exits on supercard'),
         'values' => array(
+            71 => array(
+                'name' => totranslate('5 exits'),
+                'tmdisplay' => totranslate('5 exits on the first card')
+            ),
             70 => array(
                 'name' => totranslate('6 exits'),
                 'tmdisplay' => totranslate('6 exits on the first card'),
                 'nobeginner' => true
-            ),
-            71 => array(
-                'name' => totranslate('5 exits'),
-                'tmdisplay' => totranslate('5 exits on the first card')
             ),
         ),
         'displaycondition' => array(

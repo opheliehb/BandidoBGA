@@ -37,7 +37,7 @@
 
     <a id="zoomin" class="map_zoom map_zoom_in" href="#"></a>
     <a id="zoomout" class="map_zoom map_zoom_out" href="#"></a>
-    <div id="board" class="board" style="border: 2px solid">
+    <div id="board" class="board">
         <div id="map_container">
             <div id="map_scrollable"></div>
             <div id="map_surface"></div>
