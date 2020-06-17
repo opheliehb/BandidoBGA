@@ -3,9 +3,9 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
-         * Bandido implementation : © Ophélie Haurou-Béjottes <ophelie.hb@gmail.com> & Julien Plantier <julplantier@free.fr>
-         * 
-         * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * Bandido implementation : © Ophélie Haurou-Béjottes <ophelie.hb@gmail.com> & Julien Plantier <julplantier@free.fr>
+ * 
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  * 
@@ -86,9 +86,12 @@ class Bandido extends Table
         $this->initGameStatistics();
 
         if (self::getGameStateValue('covid_variant') == 1) {
-            $this->deck_size = 69;
             $this->supercard_id = self::getGameStateValue('supercard_id');
+            $this->deck_size = 69;
             BNDExitMap::initialize($this->initial_card_exits);
+            // DEBUG
+            // $this->deck_size = 12;
+            // BNDExitMap::initialize($this->debug_card_exits);
         } else {
             $this->deck_size = 32;
             $this->supercard_id = 32;
@@ -364,7 +367,7 @@ class Bandido extends Table
         }
         $playable_locations = BNDGrid::getPlayableLocations();
 
-       BNDGrid::getGrid();
+        BNDGrid::getGrid();
         foreach ($cards as $card) {
             foreach (array(0, 90, 180, 270) as $rotation) {
                 $temp_possible_moves = array();

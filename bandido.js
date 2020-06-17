@@ -68,9 +68,9 @@ define([
                     dojo.addClass('deck', "deck_covid");
                 }
                 else {
-                    // for (var row = 0; row < 69; row++) {
-                    // DEBUG
                     for (var row = 0; row < 69; row++) {
+                    // DEBUG
+                    // for (var row = 0; row < 12; row++) {
                         this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row);
                     }
                     dojo.addClass('deck', "deck_standard");

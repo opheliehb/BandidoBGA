@@ -139,3 +139,22 @@ $this->covid_initial_card_exits = array(
     31 => [[null, null, -1, -1], [null, null, null, -1]],
     32 => [[-1, null, -1, -1], [null, -1, -1, -1]]
 );
+
+$this->debug_card_exits = array(
+    0 => [[-1, null, null, -1], [null, null, null, null]],
+    1 => [[null, null, -1, null], [null, null, -1, -1]],
+    2 => [[null, null, -1, null], [null, null, -1, null]],
+    3 => [[null, null, null, -1], [null, null, null, -1]],
+    4 => [[null, null, null, -1], [null, null, null, null]],
+    5 => [[-1, null, -1, null], [null, -1, null, null]],
+    6 => [[-1, null, null, null], [null, -1, -1, -1]],
+    7 => [[-1, null, null, -1], [null, -1, null, -1]],
+    8 => [[-1, null, -1, -1], [null, null, null, null]],
+    9 => [[null, null, null, -1], [null, -1, null, -1]],
+    10 => [[-1, null, null, -1], [null, -1, -1, null]],
+    11 => [[-1, null, -1, null], [null, null, -1, null]],
+    12 => [[null, null, -1, -1], [null, null, -1, -1]],
+    69 => [[null, null, null, null], [null, null, null, null]],
+    70 => [[-1, null, -1, -1], [null, -1, -1, -1]],
+    71 => [[null, null, -1, -1], [null, -1, -1, -1]],
+);
