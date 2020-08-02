@@ -228,6 +228,16 @@ define([
                 var cur_h = toint(dojo.style($('map_container'), 'height'));
                 dojo.style($('map_container'), 'height', (cur_h + 300) + 'px');
             },
+
+            onScreenWidthChange: function() { // Resize the scrollmap to reach the bottom of the window
+                var map_pos = dojo.position($('map_container'));
+                if (map_pos.y + map_pos.h > 0) // element is visible
+                {
+                    dojo.style($('map_container'), 'height', 
+                        Math.max(300, window.innerHeight - map_pos.y) + 'px');
+                }
+            },
+
             /** End scrollmap handlers */
 
             onUpdateActionButtons: function (stateName, args) {
