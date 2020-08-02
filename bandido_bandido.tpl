@@ -32,7 +32,6 @@
 
         <div id="playerhand" class="playerhand">
         </div>
-
     </div>
 
     <div id="board" class="board">

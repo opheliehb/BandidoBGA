@@ -18,24 +18,31 @@
 
 /********* You can start writing your CSS below this line: **********/
 
-
-.row {
-    display: flex;
-	width: 98%;
-	min-width: 800px;
-    height: 200px;
-    text-align: center;
+@media screen and (max-width: 1123px) {
+    .row {
+        text-align: center;
+    }
 }
+
+@media screen and (min-width: 1124px) {
+    .row {
+        text-align: center;
+    }
+}
+
 
 .playerhand {
     margin-top: 50px;
-	min-width: 800px;
+    min-width: 650px;
+    display: inline-block;
 }
 
 .deck {
+    display: inline-block;
+    padding: 0px 0px 0px 0px;
     overflow: hidden;
-    margin-top: 50px;
-    margin-right: 50px;
+    margin-right: 25px;
+    margin-bottom: 5px; /* to match with the margin of the cards next to it, added by the stock */
     width: 200px;
     height: 100px;
     text-align: center;
