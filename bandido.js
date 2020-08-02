@@ -117,6 +117,8 @@ define([
 
                 dojo.connect($('zoomin'), 'onclick', this, 'onClickMapZoomIn');
                 dojo.connect($('zoomout'), 'onclick', this, 'onClickMapZoomOut');
+                dojo.connect($('map_container'), (!dojo.isMozilla ? 'onmousewheel' : 'DOMMouseScroll'), 
+                    this, 'onMapMouseWheel');
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
                 dojo.connect($('moveleft'), 'onclick', this, 'onMoveLeft');
                 dojo.connect($('moveright'), 'onclick', this, 'onMoveRight');
@@ -181,6 +183,11 @@ define([
             onClickMapZoomOut: function (evt) {
                 evt.preventDefault();
                 this.changeMapZoom(-0.2);
+            },
+            onMapMouseWheel: function (evt) {
+                evt.preventDefault();
+                var scroll = evt[(!dojo.isMozilla ? "wheelDelta" : "detail")] * (!dojo.isMozilla ? 1 : -1);
+                this.changeMapZoom(scroll/150);
             },
             changeMapZoom: function (diff) {
                 newZoom = this.zoom + diff;
