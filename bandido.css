@@ -45,10 +45,10 @@
     margin-bottom: 5px; /* to match with the margin of the cards next to it, added by the stock */
     width: 200px;
     height: 100px;
-    text-align: center;
-    line-height: 100px;
-    font-size: 25px;
-    text-indent: 100%;
+    font-size: 30px;
+    text-align: start;
+    text-shadow: 4px 0 4px #FF8000, 0 -4px 4px #FF8000, 0 4px 4px #FF8000, -4px 0 4px #FF8000;
+    /* text-indent: 30%; */
 }
 
 .deck_standard {
@@ -59,13 +59,6 @@
 .deck_covid {
     background-image: url('img/cards_covid.jpg'); 
     background-position: 0% -3300%;
-}
-
-.deck:hover {
-    background-color: white;
-    opacity: 0.5;
-    background-image: none;
-    text-indent: 0%;
 }
 
 .cardontable {

@@ -267,7 +267,7 @@ define([
             //// Utility methods
 
             setDeckLabel: function (deckCount) {
-                var deckLabel = dojo.string.substitute(_("${deckCount} cards left"), {
+                var deckLabel = dojo.string.substitute(_("×${deckCount}"), {
                     deckCount: deckCount
                 });
                 dojo.byId("deck").textContent = deckLabel;
