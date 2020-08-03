@@ -117,6 +117,7 @@ define([
 
                 dojo.connect($('zoomin'), 'onclick', this, 'onClickMapZoomIn');
                 dojo.connect($('zoomout'), 'onclick', this, 'onClickMapZoomOut');
+                dojo.connect($('resize'), 'onclick', this, 'onClickMapResize');
                 dojo.connect($('map_container'), (!dojo.isMozilla ? 'onmousewheel' : 'DOMMouseScroll'), 
                     this, 'onMapMouseWheel');
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
@@ -184,6 +185,15 @@ define([
                 evt.preventDefault();
                 this.changeMapZoom(-0.2);
             },
+            onClickMapResize: function (evt) {
+                evt.preventDefault();
+                var map_pos = dojo.position($('map_container'));
+                if (map_pos.y + map_pos.h > 0) // element is visible
+                {
+                    dojo.style($('map_container'), 'height', 
+                        Math.max(300, window.innerHeight - map_pos.y) + 'px');
+                }
+            },
             onMapMouseWheel: function (evt) {
                 evt.preventDefault();
                 var scroll = evt[(!dojo.isMozilla ? "wheelDelta" : "detail")] * (!dojo.isMozilla ? 1 : -1);
@@ -228,16 +238,6 @@ define([
                 var cur_h = toint(dojo.style($('map_container'), 'height'));
                 dojo.style($('map_container'), 'height', (cur_h + 300) + 'px');
             },
-
-            onScreenWidthChange: function() { // Resize the scrollmap to reach the bottom of the window
-                var map_pos = dojo.position($('map_container'));
-                if (map_pos.y + map_pos.h > 0) // element is visible
-                {
-                    dojo.style($('map_container'), 'height', 
-                        Math.max(300, window.innerHeight - map_pos.y) + 'px');
-                }
-            },
-
             /** End scrollmap handlers */
 
             onUpdateActionButtons: function (stateName, args) {

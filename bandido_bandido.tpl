@@ -43,6 +43,7 @@
             </div>
             <a id="zoomin" class="map_zoom map_zoom_in" href="#"></a>
             <a id="zoomout" class="map_zoom map_zoom_out" href="#"></a>
+            <a id="resize" class="map_zoom map_resize" href="#"></a>
             <a id="movetop" class="map_arrow" href="#"></a>
             <a id="moveleft" class="map_arrow" href="#"></a>
             <a id="moveright" class="map_arrow" href="#"></a>
