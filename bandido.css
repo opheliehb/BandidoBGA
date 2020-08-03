@@ -21,12 +21,14 @@
 @media screen and (max-width: 1123px) {
     .row {
         text-align: center;
+        margin-bottom: 50px;
     }
 }
 
 @media screen and (min-width: 1124px) {
     .row {
         text-align: center;
+        margin-bottom: 50px;
     }
 }
 
