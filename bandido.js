@@ -197,7 +197,7 @@ define([
             onMapMouseWheel: function (evt) {
                 evt.preventDefault();
                 var scroll = evt[(!dojo.isMozilla ? "wheelDelta" : "detail")] * (!dojo.isMozilla ? 1 : -1);
-                this.changeMapZoom(scroll/150);
+                this.changeMapZoom((scroll/Math.abs(scroll))*0.2);
             },
             changeMapZoom: function (diff) {
                 newZoom = this.zoom + diff;
