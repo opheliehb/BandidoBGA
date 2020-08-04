@@ -18,33 +18,74 @@
 
 /********* You can start writing your CSS below this line: **********/
 
-@media screen and (max-width: 1123px) {
+@media screen and (max-width: 902px) {
     .row {
         text-align: center;
         margin-bottom: 50px;
+        justify-content: center;
+    }
+    
+    .deck_wrap {
+        margin-top: 50px;
+        display: inline-block;
+        margin-right: 25px;
     }
 }
 
-@media screen and (min-width: 1124px) {
+@media screen and (min-width: 903px) and (max-width: 997px) {
     .row {
         text-align: center;
         margin-bottom: 50px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .deck_wrap {
+        margin-top: 50px;
+        display: inline-block;
+        margin-right: 25px;
+    }
+}
+
+@media screen and (min-width:998px) and (max-width: 1149px) {
+    .row {
+        text-align: center;
+        margin-bottom: 50px;
+        justify-content: center;
+    }
+    
+    .deck_wrap {
+        margin-top: 50px;
+        display: inline-block;
+        margin-right: 25px;
+    }
+}
+
+@media screen and (min-width: 1150px) {
+    .row {
+        text-align: center;
+        margin-bottom: 50px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .deck_wrap {
+        margin-top: 50px;
+        display: inline-block;
+        margin-right: 25px;
     }
 }
 
 
-.playerhand {
+.playerhand_wrap {
     margin-top: 50px;
-    min-width: 650px;
+    min-width: 620px;
     display: inline-block;
 }
+
 
 .deck {
     display: inline-block;
-    padding: 0px 0px 0px 0px;
-    overflow: hidden;
-    margin-right: 25px;
-    margin-bottom: 5px; /* to match with the margin of the cards next to it, added by the stock */
     width: 200px;
     height: 100px;
     font-size: 30px;

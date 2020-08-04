@@ -28,9 +28,14 @@
 <div>
 
     <div class="row">
-        <div id="deck" class="deck"></div>
-
-        <div id="playerhand" class="playerhand">
+        <div id="deck_wrap" class="whiteblock deck_wrap">
+            <h3>{DECK}</h3>
+            <div id="deck" class="deck"></div>
+        </div>
+        <div id="playerhand_wrap" class="whiteblock playerhand_wrap">
+            <h3>{MY_HAND}</h3>
+            <div id="playerhand" class="playerhand">
+            </div>
         </div>
     </div>
 
