@@ -147,6 +147,11 @@ define([
                         this.possibleMoves = this.getSortedPossibleMoves(args.args.possibleMoves);
                         // Display possible moves in the case where the player already selected a card
                         this.updatePossibleMoves();
+                        if (args.args.possibleMoves.length == 0) {
+                            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute(
+                                _('${you} must change your hand'), { you: '${you}' });
+                            this.updatePageTitle();
+                        }
                         break;
                 }
             },
@@ -249,9 +254,6 @@ define([
                 switch (stateName) {
                     case 'playerTurn':
                         if (args.possibleMoves.length == 0) {
-                            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute(
-                                _('${you} must change your hand'), { you: '${you}' });
-                            this.updatePageTitle();
                             this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
                         }
                         if (args.gameUnwinnable != 0) {
