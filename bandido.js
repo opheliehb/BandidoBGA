@@ -273,6 +273,10 @@ define([
             //// Utility methods
 
             setDeckLabel: function (deckCount) {
+                if (deckCount == "0") {
+                    dojo.style(dojo.byId("deck"), "visibility", "hidden");
+                    return;
+                }
                 var deckLabel = dojo.string.substitute(_("×${deckCount}"), {
                     deckCount: deckCount
                 });
