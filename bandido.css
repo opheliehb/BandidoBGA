@@ -90,7 +90,7 @@
     height: 100px;
     font-size: 30px;
     text-align: start;
-    text-shadow: 4px 0 4px #FF8000, 0 -4px 4px #FF8000, 0 4px 4px #FF8000, -4px 0 4px #FF8000;
+    text-shadow: 4px 0 4px white, 0 -4px 4px white, 0 4px 4px white, -4px 0 4px white;
     /* text-indent: 30%; */
 }
 
