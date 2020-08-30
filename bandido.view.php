@@ -43,6 +43,8 @@ class view_bandido_bandido extends game_view
 
     /** Begin scrollmap enlarge display */
     $this->tpl['LABEL_ENLARGE_DISPLAY'] = self::_("Enlarge display");
+    $this->tpl['MY_HAND'] = self::_("My hand");
+    $this->tpl['DECK'] = self::_("Deck");
     /** End scrollmap enlarge display */
 
     /*********** Do not change anything below this line  ************/
