@@ -223,22 +223,22 @@ define([
             onMoveTop: function (evt) {
                 console.log("onMoveTop");
                 evt.preventDefault();
-                this.scrollmap.scroll(0, 300);
+                this.scrollmap.scroll(0, 50);
             },
             onMoveLeft: function (evt) {
                 console.log("onMoveLeft");
                 evt.preventDefault();
-                this.scrollmap.scroll(300, 0);
+                this.scrollmap.scroll(50, 0);
             },
             onMoveRight: function (evt) {
                 console.log("onMoveRight");
                 evt.preventDefault();
-                this.scrollmap.scroll(-300, 0);
+                this.scrollmap.scroll(-50, 0);
             },
             onMoveDown: function (evt) {
                 console.log("onMoveDown");
                 evt.preventDefault();
-                this.scrollmap.scroll(0, -300);
+                this.scrollmap.scroll(0, -50);
             },
             onIncreaseDisplayHeight: function (evt) {
                 console.log('$$$$ Event : onIncreaseDisplayHeight');
