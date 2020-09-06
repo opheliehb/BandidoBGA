@@ -135,11 +135,11 @@ define([
                 console.log("Ending game setup");
             },
 
-            setupTooltips: function() {
-                this.addTooltipToClass("cp_board_hand", _('Number of cards in player\'s hand'), '' );
-                this.addTooltipToClass("map_zoom_in", _('Zoom in on the board'), '' );
-                this.addTooltipToClass("map_zoom_out", _('Zoom out on the board'), '' );
-                this.addTooltipToClass("map_resize", _('Resize the board to screen size'), '' );
+            setupTooltips: function () {
+                this.addTooltipToClass("cp_board_hand", _('Number of cards in player\'s hand'), '');
+                this.addTooltipToClass("map_zoom_in", _('Zoom in on the board'), '');
+                this.addTooltipToClass("map_zoom_out", _('Zoom out on the board'), '');
+                this.addTooltipToClass("map_resize", _('Resize the board to screen size'), '');
             },
 
             ///////////////////////////////////////////////////
@@ -211,9 +211,9 @@ define([
             onMapMouseWheel: function (evt) {
                 evt.preventDefault();
                 var scroll = evt[(!dojo.isMozilla ? "wheelDelta" : "detail")] * (!dojo.isMozilla ? 1 : -1);
-                this.changeMapZoom((scroll/Math.abs(scroll))*0.2);
+                this.changeMapZoom((scroll / Math.abs(scroll)) * 0.2);
             },
-            onMapTouchMove: function(evt) {
+            onMapTouchMove: function (evt) {
                 evt.preventDefault();
             },
             changeMapZoom: function (diff) {
@@ -515,7 +515,8 @@ define([
 
             onClickPossibleMove: function (evt) {
                 dojo.stopEvent(evt);
-                // Get the cliqued move x and y
+
+                // Get the clicked move x and y
                 // Note: possiblemove id format is "possiblemove_X_Y_rotation"
                 var coords = evt.currentTarget.id.split('_');
                 var x = coords[1];
