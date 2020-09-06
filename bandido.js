@@ -130,9 +130,17 @@ define([
                 this.setMapZoom(this.zoom);
                 /** End scrollmap setup */
 
+                this.setupTooltips();
+
                 console.log("Ending game setup");
             },
 
+            setupTooltips: function() {
+                this.addTooltipToClass("cp_board_hand", _('Number of cards in player\'s hand'), '' );
+                this.addTooltipToClass("map_zoom_in", _('Zoom in on the board'), '' );
+                this.addTooltipToClass("map_zoom_out", _('Zoom out on the board'), '' );
+                this.addTooltipToClass("map_resize", _('Resize the board to screen size'), '' );
+            },
 
             ///////////////////////////////////////////////////
             //// Game & client states

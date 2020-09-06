@@ -76,7 +76,7 @@
                                 class="manipulation-arrow rotate-right anticlockwise"\
                                 style="position: absolute; left: ${left}px;"/>';
     var jstpl_player_board = '\<div class="cp_board">\
-                                    <img id="hand_${id}" src="{GAMETHEMEURL}img/hand.png" />\
+                                    <img id="hand_${id}" class="cp_board_hand" src="{GAMETHEMEURL}img/hand.png" />\
                                     <span id="handcount_${id}"></span>\
                                 </div>';
 </script>
