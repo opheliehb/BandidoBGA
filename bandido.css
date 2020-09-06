@@ -21,7 +21,7 @@
 @media screen and (max-width: 902px) {
     .row {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 35px; /* Less than that and we hit the scrollmap when the card rotates */
         justify-content: center;
     }
     
@@ -36,7 +36,7 @@
 @media screen and (min-width: 903px) and (max-width: 997px) {
     .row {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 35px; /* Less than that and we hit the scrollmap when the card rotates */
         display: flex;
         justify-content: center;
     }
@@ -52,7 +52,7 @@
 @media screen and (min-width:998px) and (max-width: 1149px) {
     .row {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 35px; /* Less than that and we hit the scrollmap when the card rotates */
         justify-content: center;
     }
     
@@ -67,7 +67,7 @@
 @media screen and (min-width: 1150px) {
     .row {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 35px; /* Less than that and we hit the scrollmap when the card rotates */
         display: flex;
         justify-content: center;
     }
@@ -80,37 +80,19 @@
     }
 }
 
-#deck {
-    box-shadow: 3px 3px 3px #333;
-}
-
 #playerhand .stockitem {
     box-shadow: 3px 3px 3px #333;
 }
 
-.cardontable {
-    box-shadow: 3px 3px 3px #333;
-}
-
-.cp_board {
-    padding-top: 10px;
-    padding-left: 5px;
-}
-
-.cp_board img {
-    vertical-align: bottom;
-}
-
 .playerhand_wrap {
     margin-top: 20px;
-    min-width: 615px;
+    min-width: 620px; /* min width for cards to not wrap on two lines when resizing */
     display: inline-block;
     padding-top: 5px;
 }
 
-
 .deck {
-    display: table-cell;
+    display: inline-block;
     width: 200px;
     height: 100px;
     font-size: 30px;
@@ -122,6 +104,7 @@
     font-weight: bold;
     color: #942c01;
     line-height: 1.4em;
+    box-shadow: 3px 3px 3px #333;
 }
 
 .deck_standard {
@@ -161,7 +144,6 @@
     opacity: 0.5; 
 }
 
-
 .possiblemove_covid:hover {
     background-image: url('img/cards_covid.jpg');
 }
@@ -169,6 +151,17 @@
 .possiblemove_standard:hover {
     background-image: url('img/cards.jpg');
 }
+
+/** Begin player board classes */
+.cp_board {
+    padding-top: 10px;
+    padding-left: 5px;
+}
+
+.cp_board img {
+    vertical-align: bottom;
+}
+/** End player board classes */
 
 /** Begin arrow classes */
 .manipulation-arrow {
