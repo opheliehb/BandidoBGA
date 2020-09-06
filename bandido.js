@@ -28,6 +28,7 @@ define([
             constructor: function () {
                 console.log('bandido constructor');
                 this.covid_variant = false;
+                this.mobile = false;
 
                 this.scrollmap = new ebg.scrollmap();
                 this.cardwidth = 200;
@@ -59,6 +60,10 @@ define([
                 this.playerHand.create(this, $('playerhand'), this.cardwidth, this.cardheight);
                 this.playerHand.image_items_per_row = 1;
 
+                if (document.getElementById("ebd-body").classList.contains("touch-device")) {
+                    this.mobile = true;
+                }
+
                 // Create cards types:
                 this.covid_variant = this.gamedatas.covid;
                 if (this.covid_variant == true) {
@@ -69,8 +74,8 @@ define([
                 }
                 else {
                     for (var row = 0; row < 69; row++) {
-                    // DEBUG
-                    // for (var row = 0; row < 12; row++) {
+                        // DEBUG
+                        // for (var row = 0; row < 12; row++) {
                         this.playerHand.addItemType(row, row, g_gamethemeurl + 'img/cards.jpg', row);
                     }
                     dojo.addClass('deck', "deck_standard");
@@ -118,7 +123,7 @@ define([
                 dojo.connect($('zoomin'), 'onclick', this, 'onClickMapZoomIn');
                 dojo.connect($('zoomout'), 'onclick', this, 'onClickMapZoomOut');
                 dojo.connect($('resize'), 'onclick', this, 'onClickMapResize');
-                dojo.connect($('map_container'), (!dojo.isMozilla ? 'onmousewheel' : 'DOMMouseScroll'), 
+                dojo.connect($('map_container'), (!dojo.isMozilla ? 'onmousewheel' : 'DOMMouseScroll'),
                     this, 'onMapMouseWheel');
                 dojo.connect($('map_container'), 'touchmove', this, 'onMapTouchMove');
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
@@ -204,7 +209,7 @@ define([
                 var map_pos = dojo.position($('map_container'));
                 if (map_pos.y + map_pos.h > 0) // element is visible
                 {
-                    dojo.style($('map_container'), 'height', 
+                    dojo.style($('map_container'), 'height',
                         Math.max(300, window.innerHeight - map_pos.y) + 'px');
                 }
             },
@@ -375,6 +380,7 @@ define([
                     // Display possible moves only if the player is active and a card is selected
                     return;
                 }
+                this.removeActionButtons(); // removing actino buttons previously there in case of mobile game
                 dojo.query('.possiblemove').forEach(dojo.destroy);
 
                 // Return immediately if there is no possible move for the selected card
@@ -457,6 +463,38 @@ define([
                 return possibleMoves;
             },
 
+            createCardPlaceHolderAndButtons: function (x, y, rotation) {
+                var card_id = this.getPossibleMoveId(x, y, rotation);
+                dojo.addClass(card_id, "cardPlaceHolder");
+                if (this.covid_variant == true) {
+                    dojo.style(card_id, "background-image", "url('" + g_gamethemeurl + "img/cards_covid.jpg')");
+                }
+                else {
+                    dojo.style(card_id, "background-image", "url('" + g_gamethemeurl + "img/cards.jpg')");
+                }
+
+                this.addActionButton('Validate', _('Validate'), 'onValidateCard');
+                this.addActionButton('Cancel', _('Cancel'), 'onCancelCard');
+            },
+
+            removeCardPlaceHolderAndButtons: function (cardPlaceHolderElements) {
+                cardPlaceHolderElements.forEach(function (element) {
+                    dojo.style(element.id, "background-image", "");
+                    dojo.removeClass(element.id, "cardPlaceHolder");
+                });
+                this.removeActionButtons();
+            },
+
+            sendMoveToServer: function (x, y, rotation, cardId) {
+                this.ajaxcall("/bandido/bandido/playCard.html", {
+                    x: x,
+                    y: y,
+                    rotation: rotation,
+                    cardId: cardId,
+                    lock: true
+                }, this, function (result) { });
+            },
+
             ///////////////////////////////////////////////////
             //// Player's action
 
@@ -480,7 +518,8 @@ define([
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
                 if (cards.length === 0) {
-                    // Clear arrows on card and possible moves, reset this.card and this.rotation
+                    // Clear arrows on card and possible moves, reset this.card and this.rotation, removes action buttons added in mobile version
+                    this.removeActionButtons();
                     dojo.query('.possiblemove').forEach(dojo.destroy);
                     dojo.query('.manipulation-arrow').forEach(dojo.destroy);
                     this.card = null;
@@ -531,17 +570,58 @@ define([
                 if (this.checkAction('playCard'))    // Check that this action is possible at this moment
                 {
                     var selected = this.playerHand.getSelectedItems();
-                    if (selected.length > 0) {
-                        card = selected[0];
-
-                        this.ajaxcall("/bandido/bandido/playCard.html", {
-                            x: x,
-                            y: y,
-                            rotation: rotation,
-                            cardId: card.id,
-                            lock: true
-                        }, this, function (result) { });
+                    if (selected.length == 0) {
+                        return;
                     }
+                    card = selected[0];
+
+                    if (this.mobile) {
+
+                        var cardPlaceHolderElements = dojo.query('.cardPlaceHolder');
+                        if (cardPlaceHolderElements.length != 0) {
+                            var coordsCardToValidate = cardPlaceHolderElements[0].id.split('_');
+                            this.removeCardPlaceHolderAndButtons(cardPlaceHolderElements);
+
+                            if (x === coordsCardToValidate[1]
+                                && y === coordsCardToValidate[2]
+                                && rotation === coordsCardToValidate[3]) {
+                                this.sendMoveToServer(x, y, rotation, card.id);
+                                return;
+                            }
+
+                        }
+
+                        this.createCardPlaceHolderAndButtons(x, y, rotation);
+                        return;
+                    }
+
+                    this.sendMoveToServer(x, y, rotation, card.id);
+
+                }
+            },
+
+            onValidateCard: function (evt) {
+                dojo.stopEvent(evt);
+
+                var cardPlaceHolderElements = dojo.query('.cardPlaceHolder');
+                if (cardPlaceHolderElements.length === 0) {
+                    return;
+                }
+                var coords = cardPlaceHolderElements[0].id.split('_');
+                
+                var x = coords[1];
+                var y = coords[2];
+                var rotation = coords[3];
+                this.removeCardPlaceHolderAndButtons(cardPlaceHolderElements);
+
+                this.sendMoveToServer(x, y, rotation, card.id);
+            },
+
+            onCancelCard: function(evt) {
+                dojo.stopEvent(evt);
+                var cardPlaceHolderElements = dojo.query('.cardPlaceHolder');
+                if (cardPlaceHolderElements.length != 0) {
+                    this.removeCardPlaceHolderAndButtons(cardPlaceHolderElements);
                 }
             },
 
@@ -607,8 +687,8 @@ define([
                 console.log(notif);
 
                 if (notif.args.cardDrawn != null) {
-                    this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, 
-                            notif.args.cardDrawn.id, "deck");
+                    this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg,
+                        notif.args.cardDrawn.id, "deck");
                     this.cardRotations[notif.args.cardDrawn.id] = 0;
                 }
             },
