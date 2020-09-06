@@ -606,7 +606,8 @@ define([
                 console.log(notif);
 
                 if (notif.args.cardDrawn != null) {
-                    this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, notif.args.cardDrawn.id);
+                    this.playerHand.addToStockWithId(notif.args.cardDrawn.type_arg, 
+                            notif.args.cardDrawn.id, "deck");
                     this.cardRotations[notif.args.cardDrawn.id] = 0;
                 }
             },
