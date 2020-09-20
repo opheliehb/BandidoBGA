@@ -517,6 +517,22 @@ class Bandido extends Table
         $this->gamestate->nextState("nextPlayer");
     }
 
+    function pass()
+    {
+        // Check that action is possible for player
+        self::checkAction('pass');
+
+        $player_id = $this->getActivePlayerId();
+
+        $possible_moves = $this->getPossibleMoves($player_id);
+        if (!empty($possible_moves)) {
+            // Can't pass if there is a possible move !
+            return;
+        }
+        
+        $this->gamestate->nextState("nextPlayer");
+    }
+
     function stopGame()
     {
         // Check that action is possible for player

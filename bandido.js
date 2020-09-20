@@ -162,8 +162,14 @@ define([
                         // Display possible moves in the case where the player already selected a card
                         this.updatePossibleMoves();
                         if (args.args.possibleMoves.length == 0) {
-                            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute(
-                                _('${you} must change your hand'), { you: '${you}' });
+                            if (this.deckCount === "0") {
+                                this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute(
+                                    _('${you} must pass (no possible move)'), { you: '${you}' });
+                            }
+                            else {
+                                this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute(
+                                    _('${you} must change your hand'), { you: '${you}' });
+                            }
                             this.updatePageTitle();
                         }
                         break;
@@ -271,7 +277,12 @@ define([
                 switch (stateName) {
                     case 'playerTurn':
                         if (args.possibleMoves.length == 0) {
-                            this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
+                            if (this.deckCount === "0") {
+                                this.addActionButton('pass', _('Pass'), 'onPass');
+                            }
+                            else {
+                                this.addActionButton('change hand', _('Change hand'), 'onChangeHand');
+                            }
                         }
                         if (args.gameUnwinnable != 0) {
                             this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
@@ -286,6 +297,7 @@ define([
             //// Utility methods
 
             setDeckLabel: function (deckCount) {
+                this.deckCount = deckCount;
                 if (deckCount == "0") {
                     dojo.style(dojo.byId("deck"), "visibility", "hidden");
                     return;
@@ -515,6 +527,12 @@ define([
                 this.ajaxcall("/bandido/bandido/changeHand.html", { lock: true }, this, function (result) { });
             },
 
+            onPass: function (evt) {
+                dojo.stopEvent(evt);
+
+                this.ajaxcall("/bandido/bandido/pass.html", { lock: true }, this, function (result) { });
+            },
+
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
                 if (cards.length === 0) {
@@ -608,7 +626,7 @@ define([
                     return;
                 }
                 var coords = cardPlaceHolderElements[0].id.split('_');
-                
+
                 var x = coords[1];
                 var y = coords[2];
                 var rotation = coords[3];
@@ -617,7 +635,7 @@ define([
                 this.sendMoveToServer(x, y, rotation, card.id);
             },
 
-            onCancelCard: function(evt) {
+            onCancelCard: function (evt) {
                 dojo.stopEvent(evt);
                 var cardPlaceHolderElements = dojo.query('.cardPlaceHolder');
                 if (cardPlaceHolderElements.length != 0) {
