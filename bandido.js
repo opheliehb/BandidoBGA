@@ -123,8 +123,7 @@ define([
                 dojo.connect($('zoomin'), 'onclick', this, 'onClickMapZoomIn');
                 dojo.connect($('zoomout'), 'onclick', this, 'onClickMapZoomOut');
                 dojo.connect($('resize'), 'onclick', this, 'onClickMapResize');
-                dojo.connect($('map_container'), (!dojo.isMozilla ? 'onmousewheel' : 'DOMMouseScroll'),
-                    this, 'onMapMouseWheel');
+                dojo.connect($('map_container'), 'onwheel', this, 'onMapMouseWheel');
                 dojo.connect($('map_container'), 'touchmove', this, 'onMapTouchMove');
                 dojo.connect($('movetop'), 'onclick', this, 'onMoveTop');
                 dojo.connect($('moveleft'), 'onclick', this, 'onMoveLeft');
@@ -220,9 +219,29 @@ define([
                 }
             },
             onMapMouseWheel: function (evt) {
+                var scroll = 0;
+                
+                if (evt.ctrlKey) {
+                    // If we are using a touchpad with the pinch action, we zoom
+                    scroll = evt.deltaY / Math.abs(evt.deltaY) * -0.03;
+                } else {
+                    // from https://stackoverflow.com/questions/10744645/detect-touchpad-vs-mouse-in-javascript/62415754#62415754
+                    if (evt.wheelDeltaY) {
+                        // If we are using a touhchpad to scroll, we ignore (this scrolls the webpage)
+                        if (evt.wheelDeltaY === (evt.deltaY * -3)) {
+                            return;
+                        }
+                    }
+                    else if (evt.deltaMode === 0) {
+                        // If we are using a touhchpad to scroll, we ignore (this scrolls the webpage)
+                        return;
+                    }
+                    // If we are using a mouse wheel to scroll, we zoom
+                    scroll = evt.deltaY / Math.abs(evt.deltaY) * -0.2;
+                }
+                // If we end up zooming on the map, we stop propagation so that the page does not scroll/zoom
                 evt.preventDefault();
-                var scroll = evt[(!dojo.isMozilla ? "wheelDelta" : "detail")] * (!dojo.isMozilla ? 1 : -1);
-                this.changeMapZoom((scroll / Math.abs(scroll)) * 0.2);
+                this.changeMapZoom(scroll);
             },
             onMapTouchMove: function (evt) {
                 evt.preventDefault();
