@@ -69,11 +69,14 @@
                               style="background-position:0px -${y}px">\
                             </div>';
 
+    var jstpl_rotatemobile = '<img src="{GAMETHEMEURL}img/rotate.svg" \
+                                class="manipulation-arrow rotate-mobile"\
+                                style="position: absolute; left: ${left}px; top:35px; "/>';
     var jstpl_rotateleft = '<img src="{GAMETHEMEURL}img/rotate.svg" \
                                 class="manipulation-arrow rotate-left"\
                                 style="position: absolute; left: ${left}px;"/>';
     var jstpl_rotateright = '<img src="{GAMETHEMEURL}img/rotate.svg" \
-                                class="manipulation-arrow rotate-right anticlockwise"\
+                                class="manipulation-arrow"\
                                 style="position: absolute; left: ${left}px;"/>';
     var jstpl_player_board = '\<div class="cp_board">\
                                     <img id="hand_${id}" class="cp_board_hand" src="{GAMETHEMEURL}img/hand.png" />\

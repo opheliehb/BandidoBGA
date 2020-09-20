@@ -220,7 +220,7 @@ define([
             },
             onMapMouseWheel: function (evt) {
                 var scroll = 0;
-                
+
                 if (evt.ctrlKey) {
                     // If we are using a touchpad with the pinch action, we zoom
                     scroll = evt.deltaY / Math.abs(evt.deltaY) * -0.03;
@@ -554,6 +554,16 @@ define([
 
             onSelectCard: function (control_name, item_id) {
                 var cards = this.playerHand.getSelectedItems();
+                this.divIdToRotate = this.playerHand.getItemDivId(item_id);
+
+                if (this.mobile && this.card && this.card.id === item_id) {
+                    // In mobile mode, clicking an already selected card rotates it
+                    this.playerHand.selectItem(item_id);
+                    this.rotate(dojo.query("#" + this.divIdToRotate)[0], true);
+                    this.updatePossibleMoves();
+                    return;
+                }
+                
                 if (cards.length === 0) {
                     // Clear arrows on card and possible moves, reset this.card and this.rotation, removes action buttons added in mobile version
                     this.removeActionButtons();
@@ -565,14 +575,18 @@ define([
                 this.card = cards[0];
 
                 // Place arrows on card
-                var divId = this.playerHand.getItemDivId(item_id);
-                var cardDiv = dojo.query("#" + divId);
+                var cardDiv = dojo.query("#" + this.divIdToRotate);
                 var leftPos = parseInt(cardDiv[0].style.left, 10) + this.cardwidth / 2;
-                this.divIdToRotate = divId;
-                // 24 is the arrow image size
-                dojo.place(this.format_block('jstpl_rotateleft', { left: leftPos - 24 }), $("playerhand"));
-                dojo.place(this.format_block('jstpl_rotateright', { left: leftPos }), $("playerhand"));
-                dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
+                if (this.mobile) {
+                    // mobile mode, only place 1 arrow
+                    dojo.place(this.format_block('jstpl_rotatemobile', { left: leftPos - 12 }), $("playerhand"));
+                }
+                else {
+                    // 24 is the arrow image size
+                    dojo.place(this.format_block('jstpl_rotateleft', { left: leftPos - 24 }), $("playerhand"));
+                    dojo.place(this.format_block('jstpl_rotateright', { left: leftPos }), $("playerhand"));
+                    dojo.query('.manipulation-arrow').connect('onclick', this, 'onClickRotateCard');
+                }
 
                 this.updatePossibleMoves();
             },

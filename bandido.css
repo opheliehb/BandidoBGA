@@ -169,25 +169,13 @@
 }
 
 .manipulation-arrow.rotate-left {
-    transform: scaleX(-1); /* transform: rotate(180deg); */
-    right: 100px;
-}
-
-.manipulation-arrow.rotate-left.anticlockwise {
-    transform: none;
-}
-
-.manipulation-arrow.reverse {
-    transform: rotate(45deg);
-}
-
-.manipulation-arrow.rotate-right {
     transform: scaleX(-1);
-    left: 100px;
 }
 
-.manipulation-arrow.rotate-right.anticlockwise {
-    transform: none; /* transform: rotate(180deg); */
+.manipulation-arrow.rotate-mobile {
+    pointer-events: none;
+    transform: scale(-2, 2);
+    opacity: 0.2;
 }
 /** End arrow classes */
 
