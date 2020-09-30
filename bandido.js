@@ -411,9 +411,10 @@ define([
                     // Display possible moves only if the player is active and a card is selected
                     return;
                 }
-                this.removeActionButtons(); // removing actino buttons previously there in case of mobile game
+                // removing actino buttons previously there in case of mobile game
+                this.removeConfirmationButtons();
                 dojo.query('.possiblemove').forEach(dojo.destroy);
-
+                
                 // Return immediately if there is no possible move for the selected card
                 if (!this.possibleMoves[this.card.id]) {
                     return;
@@ -513,7 +514,14 @@ define([
                     dojo.style(element.id, "background-image", "");
                     dojo.removeClass(element.id, "cardPlaceHolder");
                 });
-                this.removeActionButtons();
+                this.removeConfirmationButtons();
+            },
+
+            removeConfirmationButtons: function () {
+                if (dojo.byId("Validate") !== null)
+                {
+                    this.removeActionButtons();
+                }
             },
 
             sendMoveToServer: function (x, y, rotation, cardId) {
@@ -563,10 +571,10 @@ define([
                     this.updatePossibleMoves();
                     return;
                 }
-                
+
                 if (cards.length === 0) {
-                    // Clear arrows on card and possible moves, reset this.card and this.rotation, removes action buttons added in mobile version
-                    this.removeActionButtons();
+                    // Clear arrows on card and possible moves, reset this.card and this.rotation
+                    this.removeConfirmationButtons();
                     dojo.query('.possiblemove').forEach(dojo.destroy);
                     dojo.query('.manipulation-arrow').forEach(dojo.destroy);
                     this.card = null;
