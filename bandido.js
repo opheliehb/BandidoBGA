@@ -29,6 +29,7 @@ define([
                 console.log('bandido constructor');
                 this.covid_variant = false;
                 this.mobile = false;
+                this.gameUnwinnable = false;
 
                 this.scrollmap = new ebg.scrollmap();
                 this.cardwidth = 200;
@@ -106,7 +107,8 @@ define([
                 this.possibleMoves = this.getSortedPossibleMoves(this.gamedatas.possibleMoves);
 
                 if (this.gamedatas.gameUnwinnable != 0) {
-                    this.addActionButton('Abandon game', _('Abandon game'), 'onStopGame');
+                    this.gameUnwinnable = true;
+                    this.addStopGameButton();
                 }
 
                 this.setDeckLabel(this.gamedatas.deckCount);
@@ -304,9 +306,8 @@ define([
                             }
                         }
                         if (args.gameUnwinnable != 0) {
-                            this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
-                            this.addTooltip('Stop game', "",
-                                _("The game is unwinnable (isolated square). Click here to stop it now."))
+                            this.gameUnwinnable = true;
+                            this.addStopGameButton();
                         }
                         break;
                 }
@@ -414,7 +415,7 @@ define([
                 // removing actino buttons previously there in case of mobile game
                 this.removeConfirmationButtons();
                 dojo.query('.possiblemove').forEach(dojo.destroy);
-                
+
                 // Return immediately if there is no possible move for the selected card
                 if (!this.possibleMoves[this.card.id]) {
                     return;
@@ -495,6 +496,7 @@ define([
                 return possibleMoves;
             },
 
+            /* Mobile mode utility functions */
             createCardPlaceHolderAndButtons: function (x, y, rotation) {
                 var card_id = this.getPossibleMoveId(x, y, rotation);
                 dojo.addClass(card_id, "cardPlaceHolder");
@@ -518,10 +520,19 @@ define([
             },
 
             removeConfirmationButtons: function () {
-                if (dojo.byId("Validate") !== null)
-                {
+                if (dojo.byId("Validate") !== null) {
                     this.removeActionButtons();
+                    if (this.gameUnwinnable) {
+                        this.addStopGameButton();
+                    }
                 }
+            },
+            /* End Mobile mode utility functions */
+
+            addStopGameButton: function () {
+                this.addActionButton('Stop game', _('Stop game'), 'onStopGame');
+                this.addTooltip('Stop game', "",
+                    _("The game is unwinnable (isolated square). Click here to stop it now."));
             },
 
             sendMoveToServer: function (x, y, rotation, cardId) {
